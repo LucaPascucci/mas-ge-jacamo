@@ -1,0 +1,33 @@
+/*
+    domestic_robot
+    ---------------------------
+
+    JaCaMo Project File
+
+    This file defines the initial state of the MAS (initial agents, environment, organisation, ....)
+
+    (see jacamo/doc/jcm.html for more information about what can be defined in this file)
+
+    JaCaMo <VERSION>
+    <DATE>
+*/
+
+mas domestic_robot {
+
+    agent sample_agent
+
+    workspace w1 {
+     // creates an artifact named c1 as an instance of mylib.Counter initialised with (10)
+     artifact c1: mylib.Counter(10)
+     artifact bll: mylist.BlackList() {
+         focused-by: bob        // bob will focus on this artifact using its default namespace
+                     nn::alice  // alice will focus on this artifact using its nn namespace
+     }
+
+     agents: robot, owner_agent, supermarket     // carlos and marcos will join this workspace
+
+     debug                      // starts a GUI for this workspace
+}
+
+}
+

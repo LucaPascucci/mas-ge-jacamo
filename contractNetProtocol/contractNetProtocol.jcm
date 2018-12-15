@@ -1,0 +1,27 @@
+/*
+    contractNetProtocol
+    ---------------------------
+
+    JaCaMo Project File
+
+    This file defines the initial state of the MAS (initial agents, environment, organisation, ....)
+
+    (see jacamo/doc/jcm.html for more information about what can be defined in this file)
+
+    JaCaMo <VERSION>
+    <DATE>
+*/
+
+mas contractNetProtocol {
+
+    agent client // the CNP initiator
+    agent server { // the participants (3) that offer a service
+      	instances: 3
+    } 
+    agent refusingServer // a participant that always refuses
+    agent deadServer // a participant that does not answersample_agent
+
+    
+
+}
+
