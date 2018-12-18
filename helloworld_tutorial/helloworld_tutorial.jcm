@@ -39,13 +39,15 @@ mas helloworld_tutorial {
     	//focus: usa.gui //workspaceName.artifactName
     //}
     
-    agent rescue : web_socket_buffer_user.asl{
+    agent rescuer : web_socket_buffer_user.asl{
     	beliefs: message("Message")
     }
     
-    agent person : web_socket_buffer_user.asl{
+    //agent orologiaio : agent_clock.asl
+    
+    /*agent person : web_socket_buffer_user.asl{
     	beliefs: message("Message")
-    }
+    }*/
     
     //agent bob : hello2.asl {
     	//beliefs: country(us), message("prova") //Beliefs iniziali

@@ -5,7 +5,8 @@
 /* Initial goals */
 
 !setup.
-//!check_messages.
+//!startReading.
+!sendDelayedMessage.
 
 /* Plans */
 
@@ -17,35 +18,77 @@
 
 +message_sent : true <- 
 	.print("messaggio inviato con successo").
-
-+!setup : true <-
-	!setup_workspace.
-	//!setup_artifact.
 	
-+!setup_workspace : true <-
++n_messages(N) : N > 0 <-
+	.print("messaggi in coda : ",N);
+	!!get_messages.
+	
++online(C) : C = true <-
+	.print("WebSocket collegata").
+	
++online(C) : C = false <-
+	.print("WebSocket non collegata").
+	
++message_recieved : true <-
+	.print("messaggio ricevuto").
+	
++!setup : true <-
+	!setupWorkspace.
+	
++!setupWorkspace : true <-
 	.my_name(Me);
-	.concat("wp_",Me,W) 
+	.concat(Me,"_workspace",W) 
 	createWorkspace(W);
 	joinWorkspace(W,Id);
-	!setup_artifact.
+	!setupArtifact. //nuovo sub goal
 
-//Crea l'artefatto websocket nel workspace main (sarebbe il default workspace del MAS)
-+!setup_artifact : true <- 
-	makeArtifact("websocket","web.WebSocketBuffer",[],Id);
++!setupArtifact : true <- 
+	makeArtifact("websocket","web.WebSocketClientBuffer",[],Id);
 	focus(Id);
+	?online(C);
+	C = true;
 	.my_name(Me);
-	sendMessageToMiddleware(Me)[artifact_id(Id)].
+	registerBrain(Me)[artifact_id(Id)].
 
--!setup_artifact : true <-
-	.print("Piano setup_artifact fallito").
+//non utilizzato
++!startReading : online(C) & C = true <-
+	!consumeMessages.
 
-+!check_messages : online(C) & C=true & n_messages(N) & N > 0 <-
+//non utilizzato
++!consumeMessages: n_messages(N) & N > 0 <- 
+	get(Message);	
+	!consumeMessage(Message); //nuovo sub goal
+	!!consumeMessages. //nuovo goal
+
+//non utilizzato	
++!consumeMessage(Message) : true
+	<- .print(Message).
+
+//non utilizzato
+-!startReading : true <-
+	//.wait(2000);
+	!!startReading.
+
+//non utilizzato
+-!consumeMessages: true <-
+	!!consumeMessages.
+
++!sendDelayedMessage : online(C) & C = true <-
+	.wait(5000);
+	-message(M);
+	sendMessageToBody(M).
+	
+-!sendDelayedMessage : true <-
+	.wait(2000);
+	!!sendDelayedMessage.
+
++!get_messages : online(C) & C=true <-
 	get(Message);
 	.print(Message).
-	//!!check_messages.
 
-+n_messages(N) : N > 0 <-
-	!check_messages.
+-!get_messages: true <-
+	?online(C);
+	.print("Piano check messages fallito -> WebSocket online: ", C).
 
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }

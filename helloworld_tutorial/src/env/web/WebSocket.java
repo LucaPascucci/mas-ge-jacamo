@@ -44,7 +44,7 @@ public class WebSocket extends Artifact {
 		private Session session;
 
 		public Socket() {
-			String dest = "ws://localhost:8080/ChatServer_war_exploded/ws";
+			String dest = "ws://localhost:8025/middleware/middleware-service";
 			WebSocketContainer container = ContainerProvider.getWebSocketContainer();
 			try {
 				container.connectToServer(this, new URI(dest));

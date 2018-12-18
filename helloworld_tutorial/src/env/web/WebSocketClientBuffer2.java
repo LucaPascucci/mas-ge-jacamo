@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
 import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
 import javax.websocket.OnClose;
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
@@ -17,26 +19,38 @@ import javax.websocket.WebSocketContainer;
 
 import cartago.*;
 
-public class WebSocketBuffer extends Artifact {
+public class WebSocketClientBuffer2 extends Artifact {
 
-	private LinkedList<String> buffer;
+	private ConcurrentLinkedQueue<String> buffer;
 	private Socket socket;
+	private String agent_name;
 
 	void init() {
 		defineObsProperty("online",false);
 		defineObsProperty("n_messages",0);
-		this.buffer = new LinkedList<>();
+		this.buffer = new ConcurrentLinkedQueue<>();
 		this.socket = new Socket(); //start websocket client
+		this.agent_name = "";
 	}
-
+	
 	@OPERATION
-	void sendMessageToMiddleware(String message) {
+	void registerBrain(String message) {
+		this.agent_name = message;
 		if (this.socket.sendMessage(message)) {
 			this.signal("message_sent");
 		} else {
-			//TODO far fallire il piano
+			//TODO far fallire il piano dell'agente
 			this.failed("message_not_sent");
-			//failed("incBounded failed","incBounded_failed","max_value_reached",this.maxValue);
+		}
+	}
+
+	@OPERATION
+	void sendMessageToBody(String message) {
+		if (this.socket.sendMessage(this.agent_name + ": " + message)) {
+			this.signal("message_sent");
+		} else {
+			//TODO far fallire il piano dell'agente
+			this.failed("message_not_sent");
 		}
 	}
 	
@@ -47,69 +61,66 @@ public class WebSocketBuffer extends Artifact {
 	 * anyway a suspended guarded operation is reactivated and executed only if (when) no operations are in execution.
 	 */
 	@GUARD 
-	boolean itemAvailable() { 
+	boolean itemAvailable(OpFeedbackParam<Object> res) { 
 		return this.buffer.size() > 0; 
 	}
 	
 	@OPERATION
-	void put(String message){
+	void put(String message) {
 		this.buffer.add(message);
-		getObsProperty("n_messages").updateValue(this.buffer.size());
+		getObsProperty("n_messages").updateValue(this.buffer.size()); //Modifica della proprietà osservabile -> porta ad una modifica alla BB dell'agente che monitora l'artefatto
+		this.signal("message_recieved"); //UTILIZZANDO la primitiva signal si riesce a "forzare" l'estrazione del messggio da parte dell'agente
+		
+		System.out.println("Buffer list size:" + buffer.size() + " -> " + message);
 	}
 	
 	@OPERATION//(guard="itemAvailable")
 	void get(OpFeedbackParam<String> res) {
-		String message = buffer.removeFirst();
+		String message = this.buffer.poll();
 		res.set(message);
+		//ObsProperty prop = this.getObsProperty("n_messages");
+		//prop.updateValue(prop.intValue()-1);
 		getObsProperty("n_messages").updateValue(this.buffer.size());
 	}
 
 	@ClientEndpoint
 	public class Socket{
-		//CountDownLatch latch = new CountDownLatch(1); //TODO utile?
 		private Session session;
 
 		public Socket() {
-			String dest = "ws://localhost:8080/ChatServer_war_exploded/ws";
+			String dest = "ws://localhost:8025/middleware/middleware-service";
 			WebSocketContainer container = ContainerProvider.getWebSocketContainer();
 			try {
 				container.connectToServer(this, new URI(dest));
 			} catch (DeploymentException | IOException | URISyntaxException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		
 		@OnOpen
 		public void onOpen(Session session) {
-			//System.out.println("Connected to server");
 			this.session = session;
-			//latch.countDown();
 			ObsProperty prop = getObsProperty("online");
 			prop.updateValue(true);
 		}
 
 		@OnMessage
 		public void onMessage(String message, Session session) {
+			//alla ricezione di un messaggio lo inserisco nell'artefatto
 			put(message);
-			//System.out.println("Message received from server:" + message);
-			//ObsProperty prop = getObsProperty("onMessage");
-			//prop.updateValue(message);
-			
 		}
 
-		
-		//Problema!!! non riceve tutti i messaggi che manda il server
 		@OnClose
 		public void onClose(CloseReason reason, Session session) {
 			ObsProperty prop = getObsProperty("online");
 			prop.updateValue(false);
 			System.out.println("Closing a WebSocket due to " + reason.getReasonPhrase());
 		}
-
-		/*public CountDownLatch getLatch() {
-			return latch;
-		}*/
+		
+		@OnError
+		public void onError(Session session, Throwable thr) {
+			System.out.println("OnError " + session.getId());
+		}
 
 		public boolean sendMessage(String str) {
 			try {
