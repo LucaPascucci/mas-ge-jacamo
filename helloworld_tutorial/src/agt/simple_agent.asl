@@ -5,7 +5,6 @@
 /* Initial goals */
 
 !setup.
-//!startReading.
 !sendDelayedMessage.
 
 /* Plans */
@@ -14,23 +13,22 @@
 	.print("Entrato nel workspace ",W).
 
 +focused(W,A,ArtId): true <-
-	.print("Workspace:", W, " - Artifact:", A ," - ArifactId:", ArtID).
+	.print("Workspace:", W, " - Artifact:", A ," - ArtifactId:", ArtID).
 
 +message_sent : true <- 
 	.print("messaggio inviato con successo").
 	
 +n_messages(N) : N > 0 <-
-	.print("messaggi in coda : ",N);
+	//.print("messaggi in coda : ",N);
 	!!get_messages.
 	
 +online(C) : C = true <-
-	.print("WebSocket collegata").
+	.print("WebSocket collegata");
+	.my_name(Me);
+	registerBrain(Me)[artifact_id(Id)].
 	
 +online(C) : C = false <-
 	.print("WebSocket non collegata").
-	
-+message_recieved : true <-
-	.print("messaggio ricevuto").
 	
 +!setup : true <-
 	!setupWorkspace.
@@ -43,44 +41,26 @@
 	!setupArtifact. //nuovo sub goal
 
 +!setupArtifact : true <- 
-	makeArtifact("websocket","web.WebSocketClientBuffer",[],Id);
-	focus(Id);
-	?online(C);
-	C = true;
-	.my_name(Me);
-	registerBrain(Me)[artifact_id(Id)].
+	makeArtifact("websocket","web.WebSocketArt",[],Id);
+	focus(Id).
+	//?online(C);
+	//C = true;
+	//.my_name(Me);
+	//registerBrain(Me)[artifact_id(Id)].
 
-//non utilizzato
-+!startReading : online(C) & C = true <-
-	!consumeMessages.
-
-//non utilizzato
-+!consumeMessages: n_messages(N) & N > 0 <- 
-	get(Message);	
-	!consumeMessage(Message); //nuovo sub goal
-	!!consumeMessages. //nuovo goal
-
-//non utilizzato	
-+!consumeMessage(Message) : true
-	<- .print(Message).
-
-//non utilizzato
--!startReading : true <-
-	//.wait(2000);
-	!!startReading.
-
-//non utilizzato
--!consumeMessages: true <-
-	!!consumeMessages.
-
+//-!setupArtifact <-
+	//.print("Fallito setupArtifact").
+	
 +!sendDelayedMessage : online(C) & C = true <-
 	.wait(5000);
 	-message(M);
 	sendMessageToBody(M).
 	
 -!sendDelayedMessage : true <-
+	//?online(C);
+	//.print("stato websocket: ", C);
 	.wait(2000);
-	!!sendDelayedMessage.
+	!sendDelayedMessage.
 
 +!get_messages : online(C) & C=true <-
 	get(Message);
