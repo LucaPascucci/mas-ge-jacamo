@@ -39,13 +39,84 @@ mas helloworld_tutorial {
     	//focus: usa.gui //workspaceName.artifactName
     //}
     
-    agent rescuer : simple_agent.asl {
-    	beliefs: message("gotoperson")
-    }
+    agent spawner : spawner_agent.asl
     
+    //agent alone : alone_agent.asl
+    
+    /*agent alone1 : alone_agent.asl
+    
+    agent alone2 : alone_agent.asl
+    
+    agent alone3 : alone_agent.asl
+    
+    agent alone4 : alone_agent.asl
+    
+    agent alone5 : alone_agent.asl
+    
+    agent alone6 : alone_agent.asl
+    
+    agent alone7 : alone_agent.asl
+    
+    agent alone8 : alone_agent.asl
+    
+    agent alone9 : alone_agent.asl
+    
+    agent alone10 : alone_agent.asl
+    
+    agent alone11 : alone_agent.asl
+    */
+    
+    /*
     agent person : simple_agent.asl {
     	beliefs: message("green")
     }
+     
+    agent rescuer : simple_agent.asl {
+    	beliefs: message("gotoperson")
+    }
+    */
+    
+    /*
+    agent rescuer1 : simple_agent.asl {
+    	beliefs: message("gotoperson")
+    }
+    
+    agent rescuer2 : simple_agent.asl {
+    	beliefs: message("gotoperson")
+    }
+    
+    agent rescuer3 : simple_agent.asl {
+    	beliefs: message("gotoperson")
+    }
+    
+    agent rescuer4 : simple_agent.asl {
+    	beliefs: message("gotoperson")
+    }
+    
+    agent rescuer5 : simple_agent.asl {
+    	beliefs: message("gotoperson")
+    }
+    
+    agent rescuer6 : simple_agent.asl {
+    	beliefs: message("gotoperson")
+    }
+    
+    agent rescuer7 : simple_agent.asl {
+    	beliefs: message("gotoperson")
+    }
+    
+    agent rescuer8 : simple_agent.asl {
+    	beliefs: message("gotoperson")
+    }
+    
+    agent rescuer9 : simple_agent.asl {
+    	beliefs: message("gotoperson")
+    }
+    
+    agent rescuer10 : simple_agent.asl {
+    	beliefs: message("gotoperson")
+    }
+    */
     
     //agent orologiaio : agent_clock.asl
     
