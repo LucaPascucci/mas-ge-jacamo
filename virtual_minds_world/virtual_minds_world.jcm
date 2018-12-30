@@ -17,7 +17,7 @@
  * per controllare lo stato di agenti e artefatti
  * 
  */
-mas helloworld_tutorial {
+mas virtual_minds_world {
     
     //agent francois : hf.asl {
     	//beliefs: message("Bonjour") //Beliefs iniziali
@@ -74,8 +74,8 @@ mas helloworld_tutorial {
     	beliefs: message("gotoperson")
     }
     
-    agent plastic_robot : plastic_robot.asl
-    agent paper_robot : paper_robot.asl
+    agent plastic_robot : recycling_robots/plastic_robot.asl
+    agent paper_robot : recycling_robots/paper_robot.asl
     
     
     workspace recycling_robot{
