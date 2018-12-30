@@ -4,7 +4,7 @@
 
 /* Initial goals */
 
-!setup.
+!setupWebSocketArtifact.
 !sendDelayedMessage.
 
 /* Plans */
@@ -35,26 +35,18 @@
 	} else {
 		.print("Non collegato al CORPO")
 	}.
-	
-+!setup : true <-
-	!setupWorkspace.
-	
-+!setupWorkspace : true <-
-	.my_name(Me);
-	.concat(Me,"_workspace",W) 
-	createWorkspace(W);
-	joinWorkspace(W,Id);
-	!setupArtifact. //nuovo sub goal
 
-+!setupArtifact : true <- 
-	.my_name(Me)
-	makeArtifact("websocket","web.WebSocketArt",[Me],Id);
++!setupWebSocketArtifact : true <- 
+	.my_name(Me);
+	.concat("websocket_",Me,ArtifactName);
+	makeArtifact(ArtifactName,"web.WebSocketArt",[Me],Id);
 	focus(Id).
 	
 +!sendDelayedMessage : online(C1) & C2 = true & linked_to_body(C2) & C2 = true <-
 	.wait(5000);
 	-message(M);
-	sendMessageToBody(M).
+	sendMessageToBody(M);
+	!!sendStop.
 	
 -!sendDelayedMessage : true <-
 	.wait(2000);
@@ -67,6 +59,15 @@
 -!get_messages: true <-
 	?online(C);
 	.print("Piano check messages fallito -> WebSocket online: ", C).
+
++!sendStop : true <-
+	.wait(3000);
+	sendMessageToBody("stop");
+	!!sendResume.
+	
++!sendResume : true <-
+	.wait(5000);
+	sendMessageToBody("resume").
 
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }

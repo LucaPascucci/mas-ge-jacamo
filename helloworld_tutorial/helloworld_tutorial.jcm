@@ -39,7 +39,7 @@ mas helloworld_tutorial {
     	//focus: usa.gui //workspaceName.artifactName
     //}
     
-    agent spawner : spawner_agent.asl
+    //agent spawner : spawner_agent.asl
     
     //agent alone : alone_agent.asl
     
@@ -66,7 +66,6 @@ mas helloworld_tutorial {
     agent alone11 : alone_agent.asl
     */
     
-    /*
     agent person : simple_agent.asl {
     	beliefs: message("green")
     }
@@ -74,7 +73,18 @@ mas helloworld_tutorial {
     agent rescuer : simple_agent.asl {
     	beliefs: message("gotoperson")
     }
-    */
+    
+    agent plastic_robot : plastic_robot.asl
+    agent paper_robot : paper_robot.asl
+    
+    
+    workspace recycling_robot{
+    	agents : plastic_robot, paper_robot
+   		artifact garbage : garbage.GarbageArt("plastic")
+   		artifact garbage1 : garbage.GarbageArt("glass")
+   		artifact garbage2 : garbage.GarbageArt("paper")
+   		artifact garbage3 : garbage.GarbageArt("plastic")
+   	}
     
     /*
     agent rescuer1 : simple_agent.asl {

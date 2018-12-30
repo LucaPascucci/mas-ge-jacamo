@@ -36,6 +36,8 @@ public class WebSocketArt extends Artifact {
 		this.defineObsProperty("n_messages",0);
 		this.buffer = new LinkedList<>();
 		this.socket = new MyWebSocket(this.agentName);
+		
+		//System.out.println("Artifact -> ID: " + this.getId().getId() + " - name: " + this.getId().getName());
 	}
 
 	@OPERATION
@@ -164,14 +166,11 @@ public class WebSocketArt extends Artifact {
 			} else if ("STOP".equals(content)){
 				linkedToBody(false);
 			} else if ("lastmessage".equals(content)){
-				System.out.println("Arrivato ultimo messaggio: " + message);
 				this.printDelays(splittedMsg, currentMillis);
-				this.counter++;
 				this.printAverage();
 				addMessage(content);
 			} else {
 				this.printDelays(splittedMsg, currentMillis);
-				this.counter++;
 				addMessage(content);
 			}
 		}
@@ -213,6 +212,7 @@ public class WebSocketArt extends Artifact {
 			this.U_t_M += unityToMiddleware;
 			this.MC += middlewareComputation;
 			this.M_t_J += middlewareToJacamo;
+			this.counter++;
 		}
 		
 		private void printAverage() {
@@ -220,7 +220,7 @@ public class WebSocketArt extends Artifact {
 			double avgUM = (double)this.U_t_M / this.counter;
 			double avgMC = (double)this.MC / this.counter;
 			double avgMJ = (double)this.M_t_J / this.counter;
-			System.out.println(this.name + ": AVERAGE(" + this.counter + ") - U_to_M: " + avgUM + " -> M: " + avgMC + " -> M_to_J: " + avgMJ + "\n");
+			System.out.println(this.name + ": AVERAGE(" + this.counter + ")- U_to_M: " + avgUM + " -> M: " + avgMC + " -> M_to_J: " + avgMJ + "\n");
 		}
 	}
 }

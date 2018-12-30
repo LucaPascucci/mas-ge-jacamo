@@ -2,11 +2,11 @@
 
 /* Initial beliefs and rules */
 message("messaggio").
-message_number(500).
+message_number(500). 
 
 /* Initial goals */
 
-!setup.
+!setupWebSocketArtifact.
 //!sendDelayedMessage.
 
 /* Plans */
@@ -38,20 +38,11 @@ message_number(500).
 	} else {
 		.print("CORPO NON COLLEGATO")
 	}.
-	
-+!setup : true <-
-	!setupWorkspace.
-	
-+!setupWorkspace : true <-
-	.my_name(Me);
-	.concat(Me,"_workspace",W);
-	createWorkspace(W);
-	joinWorkspace(W,Id);
-	!setupArtifact. //nuovo sub goal
 
-+!setupArtifact : true <- 
++!setupWebSocketArtifact : true <- 
 	.my_name(Me)
-	makeArtifact("websocket","web.WebSocketArt",[Me],Id);
+	.concat("websocket",Me,ArtifactName);
+	makeArtifact(ArtifactName,"web.WebSocketArt",[Me],Id);
 	focus(Id).
 	
 +!sendDelayedMessage : online(C1) & C2 = true & linked_to_body(C2) & C2 = true & message_number(N) & N > 1 <-
