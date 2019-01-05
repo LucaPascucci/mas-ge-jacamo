@@ -2,12 +2,11 @@
 
 /* Initial beliefs and rules */
 message("messaggio").
-message_number(500). 
+message_number(0). 
 
 /* Initial goals */
 
 !setupWebSocketArtifact.
-//!sendDelayedMessage.
 
 /* Plans */
 
@@ -42,11 +41,11 @@ message_number(500).
 +!setupWebSocketArtifact : true <- 
 	.my_name(Me)
 	.concat("websocket",Me,ArtifactName);
-	makeArtifact(ArtifactName,"web.WebSocketArt",[Me],Id);
+	makeArtifact(ArtifactName,"web.WebSocket",[Me],Id);
 	focus(Id).
 	
 +!sendDelayedMessage : online(C1) & C2 = true & linked_to_body(C2) & C2 = true & message_number(N) & N > 1 <-
-	.wait(100);
+	//.wait(100);
 	?message(M);
 	-+message_number(N-1);
 	sendMessageToBody(M);
@@ -61,8 +60,8 @@ message_number(500).
 	!!sendDelayedMessage.
 
 +!get_messages : online(C) & C=true <-
-	get(Message).
-	//.print(Message).
+	get(Message);
+	.print(Message).
 
 -!get_messages: true <-
 	?online(C);

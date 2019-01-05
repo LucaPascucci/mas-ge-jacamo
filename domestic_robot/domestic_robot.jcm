@@ -14,20 +14,23 @@
 
 mas domestic_robot {
 
-    agent sample_agent
+	agent robot : robot.asl {
+		focus: local.env_art
+	}
+	agent owner_agent : owner_agent.asl {
+		focus: local.env_art
+	}
+	agent supermarket : supermarket.asl {
+		focus: local.env_art
+	}
 
-    workspace w1 {
-     // creates an artifact named c1 as an instance of mylib.Counter initialised with (10)
-     artifact c1: mylib.Counter(10)
-     artifact bll: mylist.BlackList() {
-         focused-by: bob        // bob will focus on this artifact using its default namespace
-                     nn::alice  // alice will focus on this artifact using its nn namespace
-     }
+    workspace local {
 
-     agents: robot, owner_agent, supermarket     // carlos and marcos will join this workspace
-
+     	//agents: robot, owner_agent, supermarket     // carlos and marcos will join this workspace
+		artifact art_env : env.HouseEnv("gui")
+   		
      debug                      // starts a GUI for this workspace
-}
+	}
 
 }
 

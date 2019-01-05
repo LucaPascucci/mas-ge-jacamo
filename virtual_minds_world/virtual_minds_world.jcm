@@ -18,6 +18,38 @@
  * 
  */
 mas virtual_minds_world {
+	
+	//agent spawner : spawner_agent.asl
+    
+    agent test : alone_agent.asl
+	
+	/*agent person : simple_agent.asl {
+    	beliefs: message("green")
+    }
+     
+    agent rescuer : simple_agent.asl {
+    	beliefs: message("gotoperson")
+    }*/
+    
+    /*agent plastic_robot : recycling_robots/plastic_robot.asl {
+    	beliefs: robot_type("plastic")
+    }
+    /*agent paper_robot : recycling_robots/paper_robot.asl {
+    	beliefs: robot_type("paper")
+    }*/
+    
+    
+    /*workspace recycling_robot{
+    	agents : plastic_robot	//, paper_robot
+   		artifact garbage : recycling_robots_env.Garbage("plastic")
+   		artifact plastic_bin : recycling_robots_env.Bin("plastic")
+   		artifact paper_bin : recycling_robots_env.Bin("paper")
+   		
+   		artifact garbage1 : recycling_robots_env.Garbage("paper")
+   		
+   		artifact garbage2 : recycling_robots_env.Garbage("glass")
+   		artifact garbage3 : recycling_robots_env.Garbage("plastic")
+   	}*/
     
     //agent francois : hf.asl {
     	//beliefs: message("Bonjour") //Beliefs iniziali
@@ -39,100 +71,8 @@ mas virtual_minds_world {
     	//focus: usa.gui //workspaceName.artifactName
     //}
     
-    //agent spawner : spawner_agent.asl
-    
-    //agent alone : alone_agent.asl
-    
-    /*agent alone1 : alone_agent.asl
-    
-    agent alone2 : alone_agent.asl
-    
-    agent alone3 : alone_agent.asl
-    
-    agent alone4 : alone_agent.asl
-    
-    agent alone5 : alone_agent.asl
-    
-    agent alone6 : alone_agent.asl
-    
-    agent alone7 : alone_agent.asl
-    
-    agent alone8 : alone_agent.asl
-    
-    agent alone9 : alone_agent.asl
-    
-    agent alone10 : alone_agent.asl
-    
-    agent alone11 : alone_agent.asl
-    */
-    
-    agent person : simple_agent.asl {
-    	beliefs: message("green")
-    }
-     
-    agent rescuer : simple_agent.asl {
-    	beliefs: message("gotoperson")
-    }
-    
-    agent plastic_robot : recycling_robots/plastic_robot.asl
-    agent paper_robot : recycling_robots/paper_robot.asl
-    
-    
-    workspace recycling_robot{
-    	agents : plastic_robot, paper_robot
-   		artifact garbage : garbage.GarbageArt("plastic")
-   		artifact garbage1 : garbage.GarbageArt("glass")
-   		artifact garbage2 : garbage.GarbageArt("paper")
-   		artifact garbage3 : garbage.GarbageArt("plastic")
-   	}
-    
-    /*
-    agent rescuer1 : simple_agent.asl {
-    	beliefs: message("gotoperson")
-    }
-    
-    agent rescuer2 : simple_agent.asl {
-    	beliefs: message("gotoperson")
-    }
-    
-    agent rescuer3 : simple_agent.asl {
-    	beliefs: message("gotoperson")
-    }
-    
-    agent rescuer4 : simple_agent.asl {
-    	beliefs: message("gotoperson")
-    }
-    
-    agent rescuer5 : simple_agent.asl {
-    	beliefs: message("gotoperson")
-    }
-    
-    agent rescuer6 : simple_agent.asl {
-    	beliefs: message("gotoperson")
-    }
-    
-    agent rescuer7 : simple_agent.asl {
-    	beliefs: message("gotoperson")
-    }
-    
-    agent rescuer8 : simple_agent.asl {
-    	beliefs: message("gotoperson")
-    }
-    
-    agent rescuer9 : simple_agent.asl {
-    	beliefs: message("gotoperson")
-    }
-    
-    agent rescuer10 : simple_agent.asl {
-    	beliefs: message("gotoperson")
-    }
-    */
-    
     //agent orologiaio : agent_clock.asl
     
-    /*agent person : web_socket_buffer_user.asl{
-    	beliefs: message("Message")
-    }*/
     
     //agent bob : hello2.asl {
     	//beliefs: country(us), message("prova") //Beliefs iniziali
@@ -158,10 +98,6 @@ mas virtual_minds_world {
     
     //workspace usa {
     	//artifact gui: display.GUIConsole("USA")
-    //}
-    
-    //workspace web {
-    	//artifact wb : web.WebSocket()
     //}
     
 }

@@ -4,7 +4,7 @@
 
 /* Initial goals */
 
-!agentsnumber(1).
+!agentsnumber(10).
 /* Plans */
 
 +!agentsnumber(N) : N > 0 <-

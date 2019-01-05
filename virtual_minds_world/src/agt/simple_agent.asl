@@ -1,4 +1,3 @@
-// Agent web_socket_user in project helloworld_tutorial
 
 /* Initial beliefs and rules */
 
@@ -39,7 +38,7 @@
 +!setupWebSocketArtifact : true <- 
 	.my_name(Me);
 	.concat("websocket_",Me,ArtifactName);
-	makeArtifact(ArtifactName,"web.WebSocketArt",[Me],Id);
+	makeArtifact(ArtifactName,"web.WebSocket",[Me],Id);
 	focus(Id).
 	
 +!sendDelayedMessage : online(C1) & C2 = true & linked_to_body(C2) & C2 = true <-
