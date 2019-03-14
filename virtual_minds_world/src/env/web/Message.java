@@ -4,67 +4,77 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
 public class Message {
 
-	private String Sender;
-	private String Receiver;
-	private String Content;
-	private ArrayList<Object> Parameters;
-	private LinkedList<Long> TimeStats;
+	@SerializedName("Sender")
+	private String sender;
+	
+	@SerializedName("Receiver")
+	private String receiver;
+	
+	@SerializedName("Content")
+	private String content;
+	
+	@SerializedName("Parameters")
+	private ArrayList<Object> parameters;
+	
+	@SerializedName("TimeStats")
+	private LinkedList<Long> timeStats;
 	
 	private static Gson gson = new Gson();
 
 	public Message(final String sender, final String receiver, final String content, final ArrayList<Object> parameters, final LinkedList<Long> timeStats) {
-		Sender = sender;
-		Receiver = receiver;
-		Content = content;
-		Parameters = parameters;
-		TimeStats = timeStats;
+		this.sender = sender;
+		this.receiver = receiver;
+		this.content = content;
+		this.parameters = parameters;
+		this.timeStats = timeStats;
 	}
 
 	public String getSender() {
-		return Sender;
+		return sender;
 	}
 
 	public void setSender(String sender) {
-		Sender = sender;
+		this.sender = sender;
 	}
 
 	public String getReceiver() {
-		return Receiver;
+		return receiver;
 	}
 
 	public void setReceiver(String receiver) {
-		Receiver = receiver;
+		this.receiver = receiver;
 	}
 
 	public String getContent() {
-		return Content;
+		return content;
 	}
 
 	public void setContent(String content) {
-		Content = content;
+		this.content = content;
 	}
 
 	public ArrayList<Object> getParameters() {
-		return Parameters;
+		return parameters;
 	}
 
 	public void setParameters(ArrayList<Object> parameters) {
-		Parameters = parameters;
+		this.parameters = parameters;
 	}
 
 	public LinkedList<Long> getTimeStats() {
-		return TimeStats;
+		return timeStats;
 	}
 
 	public void setTimeStats(LinkedList<Long> timeStats) {
-		TimeStats = timeStats;
+		this.timeStats = timeStats;
 	}
 
 	public void addTimeStat(long time){
-		TimeStats.add(time);
+		this.timeStats.add(time);
 	}
 	
 	@Override

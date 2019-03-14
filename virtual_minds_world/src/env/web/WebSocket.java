@@ -3,6 +3,7 @@ package web;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import javax.websocket.ClientEndpoint;
@@ -31,15 +32,28 @@ public class WebSocket extends Artifact {
 		this.defineObsProperty("online",false);
 		this.defineObsProperty("linked_to_body",false);
 		this.defineObsProperty("n_messages",0);
+		this.defineObsProperty("n_messages_obj", 0);
 		this.buffer = new LinkedList<>();
 		this.messagesIN = new LinkedList<>();
 		this.socket = new MyWebSocket(this.agentName);
 		
 		//System.out.println("Artifact -> ID: " + this.getId().getId() + " - name: " + this.getId().getName());
 	}
-
+	
 	@OPERATION
-	void sendMessageToBody(String message) {
+	void action(String content) { //TODO aggiungere parametri dinamici
+		Message message = new Message(this.agentName,this.agentName,content,new ArrayList<>(),new LinkedList<>());
+		if (this.socket.sendMessage(message)) {
+			this.signal("message_sent");
+		} else {
+			//TODO far fallire il piano dell'agente
+			this.failed("message_not_sent");
+		}
+	}
+	
+	@OPERATION
+	void action(String content,int value) { //TODO aggiungere parametri dinamici
+		Message message = new Message(this.agentName,this.agentName,content,new ArrayList<>(value),new LinkedList<>());
 		if (this.socket.sendMessage(message)) {
 			this.signal("message_sent");
 		} else {
@@ -58,16 +72,44 @@ public class WebSocket extends Artifact {
 		res.set(message);
 	}
 	
+	/**
+	 * Preleva il primo messaggio
+	 * @param res messaggio prelevato
+	 */
+	@OPERATION
+	void getAnswer(OpFeedbackParam<Object> res) {
+		Message message = this.messagesIN.removeFirst();
+		//TODO passare - content + parametri 
+		res.set(message);
+		this.signal(message.getContent(),message.getParameters());
+	}
+	
+	@OPERATION(guard="MessageAvailable")
+	void getAnswerWithGuard(OpFeedbackParam<Object> res) {
+		Message message = this.messagesIN.removeFirst();
+		//TODO passare - content + parametri
+		this.signal(message.getContent());
+		this.signal(message.getContent(),message.getParameters());
+		res.set(message);
+	}
+	@OPERATION(guard="MessageAvailable")
+	void getStringAnswerWithGuard(OpFeedbackParam<String> res) {
+		Message message = this.messagesIN.removeFirst();
+		//TODO passare - content + parametri
+		this.signal(message.getContent());
+		this.signal(message.getContent(),message.getParameters());
+		res.set(message.toString());
+	}
+	
+	@GUARD
+	  boolean MessageAvailable(OpFeedbackParam<Object> res){
+	    return this.messagesIN.size() > 0;
+	  }
+	
 	//Internal Operation = utile per definire del codice asincrono eseguito dentro l'artefatto 
 	@INTERNAL_OPERATION
 	void addMessageInternal(String message) {
 		this.buffer.add(message);
-	}
-	
-	//Internal Operation = utile per definire del codice asincrono eseguito dentro l'artefatto 
-	@INTERNAL_OPERATION
-	void addMessageInternal(Message message) {
-		this.messagesIN.add(message);
 	}
 	
 	void addMessage(String message) {
@@ -85,7 +127,7 @@ public class WebSocket extends Artifact {
 		 * before starting calling methods on the artifact.
 		 */
 		this.beginExternalSession();
-		this.buffer.add(message); //TODO potrebbe causare un blocco
+		this.buffer.add(message);
 		this.updateObsProperty("n_messages", this.buffer.size()); //Aggiorna la proprietà osservabile -> porta ad una modifica alla BB dell'agente che monitora l'artefatto
 		/*
 		 * Ends an external use session. 
@@ -96,21 +138,13 @@ public class WebSocket extends Artifact {
 	
 	void addMessage(Message message) {
 		/*
-		 * Start the execution of an internal operation. 
-		 * The execution/success semantics of the new operation 
-		 * is completely independent from current operation.
-		 */
-		//TODO NON va bene perchè essendo asincrona non sappiamo quando realmente viene eseguita
-		//this.execInternalOp("addMessageInternal", message); //Metodo per eseguire una internal operation 
-		
-		/*
 		 * Begins an external use session of the artifact. 
 		 * Method to be called by external threads (not agents) 
 		 * before starting calling methods on the artifact.
 		 */
 		this.beginExternalSession();
-		this.messagesIN.add(message); //TODO potrebbe causare un blocco
-		this.updateObsProperty("n_messages", this.buffer.size()); //Aggiorna la proprietà osservabile -> porta ad una modifica alla BB dell'agente che monitora l'artefatto
+		this.messagesIN.add(message);
+		this.updateObsProperty("n_messages_obj", this.messagesIN.size()); //Aggiorna la proprietà osservabile -> porta ad una modifica alla BB dell'agente che monitora l'artefatto
 		/*
 		 * Ends an external use session. 
 		 * Method to be called to close a session started by a thread to finalize the state.
@@ -147,11 +181,10 @@ public class WebSocket extends Artifact {
 		public MyWebSocket(final String name) {
 			this.name = name;
 			String dest = "ws://localhost:8025/middleware" + ENDPOINT_PATH + ENTITY_PATH + "/" + name;
-			/*
-			 * Utilizzando ClientManager-> asyncConnectToServer la connessione avviene in un 
-			 * thread separato permettendo l'uscita dal flusso di controllo dell'artefatto
-			 */
-			ClientManager client = ClientManager.createClient(); 
+			
+			//Utilizzando ClientManager-> asyncConnectToServer la connessione avviene in un thread separato permettendo l'uscita dal flusso di controllo dell'artefatto
+			ClientManager client = ClientManager.createClient();
+			
 			//TODO ritorna null??
 			System.out.println("SHARED_CONTAINER: " + client.getProperties().get(ClientProperties.SHARED_CONTAINER));
 			
@@ -187,7 +220,7 @@ public class WebSocket extends Artifact {
 		public void onMessage(String message, Session session) {
 			long currentMillis = System.currentTimeMillis();
 			Message msgObj = Message.buildMessage(message);
-			System.out.println(message);
+			//System.out.println(message);
 			
 			switch (msgObj.getContent()) {
 			case "START":
@@ -196,21 +229,17 @@ public class WebSocket extends Artifact {
 			case "STOP":
 				linkedToBody(false);
 				break;
-				
 			case "lastmessage":
 				//this.printDelays(splittedMsg, currentMillis);
 				//this.printAverage();
-				addMessage(msgObj.getContent());
+				//addMessage(msgObj.getContent());
 				break;
 			default:
 				//this.printDelays(splittedMsg, currentMillis);
-				addMessage(msgObj.getContent());
+				addMessage(msgObj);
+				//addMessage(msgObj.getContent());
 				break;
 			}
-			
-			/*String splittedMsg[] = message.split(Pattern.quote("|"));
-			String content = splittedMsg[0]; */
-			
 		}
 
 		@OnClose
@@ -222,14 +251,13 @@ public class WebSocket extends Artifact {
 		
 		@OnError
 		public void onError(Session session, Throwable error) {
-			System.out.println("OnError " + session.getId() + " - message: " + error.getMessage());
+			System.out.println("OnError session:" + session.getId() + " - message: " + error.getMessage());
+			error.printStackTrace();
 		}
 		
 		public boolean sendMessage(final String message) {
 			try {
 				this.session.getBasicRemote().sendText(message + "|" + System.currentTimeMillis() );
-				//TODO se necessario è possibile utilizzare una send ASINCRONA
-				//Future<Void> future = this.session.getAsyncRemote().sendText(message);
 				return true;
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -241,8 +269,6 @@ public class WebSocket extends Artifact {
 			try {
 				message.addTimeStat(System.currentTimeMillis());
 				this.session.getBasicRemote().sendText(message.toString());
-				//TODO se necessario è possibile utilizzare una send ASINCRONA
-				//Future<Void> future = this.session.getAsyncRemote().sendText(message);
 				return true;
 			} catch (IOException e) {
 				e.printStackTrace();

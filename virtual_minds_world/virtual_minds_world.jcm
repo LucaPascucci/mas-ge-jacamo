@@ -21,7 +21,11 @@ mas virtual_minds_world {
 	
 	//agent spawner : spawner_agent.asl
     
-    agent test : alone_agent.asl
+    //agent test1 : alone_agent.asl
+    //agent test2 : alone_agent.asl
+    
+    agent test1 : alone_agent_copia.asl
+    agent test2 : alone_agent_copia.asl
 	
 	/*agent person : simple_agent.asl {
     	beliefs: message("green")

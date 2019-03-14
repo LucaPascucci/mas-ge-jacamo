@@ -10,25 +10,15 @@ message_number(5).
 
 /* Plans */
 
-+joined(W,_) : true <-
-	.print("Entrato nel workspace ",W).
+//+joined(W,_) : true <-
+	//.print("Entrato nel workspace ",W).
 
-+focused(W,A,ArtId): true <-
-	.print("Workspace:", W, " - Artifact:", A ," - ArtifactId:", ArtID).
-
-//+message_sent : true <- 
-	//.print("messaggio inviato con successo").
-	
-+n_messages(N) : N > 0 <-
+ +focused(W,A,ArtId): true <-
+	.print("Workspace: ", W, " - Artifact: ", A ," - ArtifactId: ", ArtID).
+					
++incoming_messages(N) : N > 0 <-
 	//.print("messaggi in coda : ",N);
-	!!get_messages. 					//GIUSTO CREARE UN NUOVO GOAL?
-
-//+n_messages_obj(N) : N > 0 <-
-	//.print("messaggi in coda : ",N);
-	//!!get_messages_obj. 
-	
-+onMouseEnter(P) <-
-	.print(P).
+	!!get_messages. 				//GIUSTO CREARE UN NUOVO GOAL?
 
 +online(C) : true <-
 	if (C = true){
@@ -37,7 +27,7 @@ message_number(5).
 		.print("WEBSOCKET NON COLLEGATA")
 	}.
 	
-+linked_to_body(C) : true <-
++link_to_body(C) : true <-
 	if (C = true){
 		.print("CORPO COLLEGATO");
 		!!sendDelayedMessage;
@@ -48,17 +38,18 @@ message_number(5).
 
 +!setupWebSocketArtifact : true <- 
 	.my_name(Me)
-	.concat("websocket",Me,ArtifactName);
-	makeArtifact(ArtifactName,"web.WebSocket",[Me],Id);
+	.concat("websocket_",Me,ArtifactName);
+	makeArtifact(ArtifactName,"web.WebSocketAloneAgent",[Me],Id);
 	focus(Id).
 	
-+!sendDelayedMessage : online(C1) & C2 = true & linked_to_body(C2) & C2 = true & message_number(N) & N > 1 <-
-	//.wait(100);
++!sendDelayedMessage : online(C1) & C1 = true & linked_to_body(C2) & C2 = true & message_number(N) & N > 1 <-
+	.print("sendDelayedMessage");
+	.wait(100);
 	?message(C);
 	-+message_number(N-1);
-	action(C,N);
-	!waitMessage;
-	!!sendDelayedMessage.
+	azionePersonalizzata.
+	//!waitMessage;
+	//!!sendDelayedMessage.
 	
 -!sendDelayedMessage : message_number(N) & N = 1 <-
 	action("lastmessage",N);
@@ -69,24 +60,22 @@ message_number(5).
 	!!sendDelayedMessage.
 
 +!get_messages : online(C) & C=true <-
-	get(Message);
-	.print(Message).
+	getAnswer(Message);
+	cartago.invoke_obj(Message,getContent,Res);
+	.print(Res);
+	cartago.invoke_obj(Message,getParameters,Array);
+	cartago.array_to_list(Array,Res2);
+	.print(Res2).
+	// .print(Message).
 
 -!get_messages: true <-
-	?online(C);
-	.print("Piano get_messages fallito -> WebSocket online: ", C).
-	
-+!get_messages_obj : online(C) & C=true <-
-	getMessage(Message);
-	.print(Message).
-
--!get_messages_obj: true <-
 	?online(C);
 	.print("Piano get_messages fallito -> WebSocket online: ", C).
 
 +!waitMessage <-
 	.print("In attesa di un messaggio");
 	getStringResponse(Message);
+	
 	.print(Message);
 	!!waitMessage.
 	
