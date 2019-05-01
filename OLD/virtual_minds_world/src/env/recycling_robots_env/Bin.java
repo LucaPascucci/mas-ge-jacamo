@@ -17,13 +17,8 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 
 import org.glassfish.tyrus.client.ClientManager;
-import org.glassfish.tyrus.client.ClientProperties;
-
-import com.google.gson.Gson;
 
 import cartago.*;
-import recycling_robots_env.Garbage.MyWebSocket;
-import web.Message;
 
 public class Bin extends Artifact {
 	
@@ -58,7 +53,7 @@ public class Bin extends Artifact {
 			ClientManager client = ClientManager.createClient(); 
 
 			try {
-				final Future<Session> future = client.asyncConnectToServer(this, new URI(dest));
+			   client.asyncConnectToServer(this, new URI(dest));
 			} catch (DeploymentException | URISyntaxException e1) {
 				e1.printStackTrace();
 			}

@@ -218,7 +218,6 @@ public class WebSocket extends Artifact {
 		//Tyrus utilizza un flusso di controllo separato per la ricezione di messaggi quindi
 		@OnMessage
 		public void onMessage(String message, Session session) {
-			long currentMillis = System.currentTimeMillis();
 			Message msgObj = Message.buildMessage(message);
 			//System.out.println(message);
 			

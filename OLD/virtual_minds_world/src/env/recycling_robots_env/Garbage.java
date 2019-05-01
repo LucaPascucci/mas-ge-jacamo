@@ -68,7 +68,7 @@ public class Garbage extends Artifact {
 			ClientManager client = ClientManager.createClient(); 
 
 			try {
-				final Future<Session> future = client.asyncConnectToServer(this, new URI(dest));
+			   client.asyncConnectToServer(this, new URI(dest));
 			} catch (DeploymentException | URISyntaxException e1) {
 				e1.printStackTrace();
 			}

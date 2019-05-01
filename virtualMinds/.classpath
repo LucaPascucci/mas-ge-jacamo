@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry excluding="**/*.asl" kind="src" path="src/agt"/>
+	<classpathentry excluding="*.ptl" kind="src" path="src/int"/>
+	<classpathentry excluding="*.xml" kind="src" path="src/org"/>
+	<classpathentry kind="src" path="src/env"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JaCaMo"/>
+	<classpathentry kind="lib" path="lib/gson-2.8.5.jar" sourcepath="lib/gson-2.8.5-sources.jar"/>
+	<classpathentry kind="lib" path="lib/tyrus-standalone-client-1.12.jar" sourcepath="lib/tyrus-standalone-client-1.12-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry excluding="**/*.asl" kind="src" path="src/agt" />
-	<classpathentry excluding="*.ptl" kind="src" path="src/int" />
-	<classpathentry excluding="*.xml" kind="src" path="src/org" />
-	<classpathentry kind="src" path="src/env" />
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JaCaMo"/>	<classpathentry kind="output" path="bin/classes"/></classpath>
+	<classpathentry kind="output" path="bin/classes"/>
+</classpath>

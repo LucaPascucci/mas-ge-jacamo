@@ -1,14 +1,20 @@
-// Agent sample_agent in project virtualMinds
+// Agent spawner_agent in project helloworld_tutorial
 
 /* Initial beliefs and rules */
 
 /* Initial goals */
 
-!start.
-
+!agentsnumber(10).
 /* Plans */
 
-+!start : true <- .print("hello world.").
++!agentsnumber(N) : N > 0 <-
+	.print("crea agente ", N);
+	.concat("alone",N,W);
+	.create_agent(W,"/src/agt/alone_agent.asl");
+	!agentsnumber(N-1).
+
+-!agentsnumber(N) : true <-
+	.print("conclusa creazione agenti").
 
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }
