@@ -1,5 +1,8 @@
 /* Initial beliefs and rules */
 
+nervousware_url("ws://localhost:8025/middleware").
+endpoint_path("/service").
+
 /* Initial goals */
 
 !setupWebSocketArtifact.
@@ -12,10 +15,6 @@
 
 +focused(W,A,ArtId): true <-
 	.print("Workspace: ", W, " - Artifact: ", A ," - ArtifactId: ", ArtID).
-					
-+incoming_messages_number(N) : N > 0 <-
-	.print("messaggi in coda : ",N);
-	!!get_message. 				//GIUSTO CREARE UN NUOVO GOAL?
 
 +online_status(C) <-
 	if (C = true){
@@ -24,38 +23,31 @@
 		.print("WEBSOCKET NON COLLEGATA")
 	}.
 	
-+linked_to_body_status(C) : true <-
++linked_to_body_status(C) <-
 	if (C = true){
 		.print("CORPO COLLEGATO");
 	} else {
 		.print("CORPO NON COLLEGATO")
 	}.
+	
++new_message(S,R,C,P) <- 
+   .print("NUOVO MESSAGGIO --> Sender: ", S, " - Receiver: ", R, " - Content:", C, " - Parametri:", P).
 
-+!setupWebSocketArtifact : true <- 
++!setupWebSocketArtifact : nervousware_url(U) & endpoint_path(P) <- 
 	.my_name(Me)
 	.concat("websocket_",Me,ArtifactName);
-	makeArtifact(ArtifactName,"artifacts.SimpleAgentArtifact",[Me],Id);
+	makeArtifact(ArtifactName,"artifacts.SimpleAgentArtifact",[Me,U,P],Id);
 	focus(Id).
 	
 +!sendAction: online_status(C1) & C1 = true & linked_to_body_status(C2) & C2 = true <-
    azionePersonalizzata;
    .wait(3000);
-   !!sendAction. //CREA UN NUOVO GOAL
+   !!sendAction.
 
 -!sendAction <-
    .wait(3000);
-   !!sendAction. //CREA UN NUOVO GOAL?
+   !!sendAction.
 
-+!get_message <-
-	getPerception(Message);
-	cartago.invoke_obj(Message,getContent,Res);
-	.print(Res);
-	cartago.invoke_obj(Message,getParameters,Array);
-	cartago.array_to_list(Array,Res2);
-	.print(Res2).
-
--!get_message: true <-
-	.print("Piano get_message fallito").
 	
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }
