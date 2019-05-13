@@ -1,56 +1,58 @@
 /* Initial beliefs and rules */
 
-nervousware_url("ws://localhost:8025/middleware").
-endpoint_path("/service").
+synapsis_url("ws://localhost:8025/synapsis/").
+synapsis_endpoint_path("endpoint/").
+reconnection_attempts(5).
+synapsis_body_class("artifacts.SimpleAgentBody").
+
 
 /* Initial goals */
 
-!setupWebSocketArtifact.
-!sendAction.
+
+!createSynapsisBody.
+!personalSend.
 
 /* Plans */
 
-+joined(W,_) : true <-
-	.print("Entrato nel workspace ",W).
+//+focused(W,A,ArtId) <-
+  // .print("Focused --> Workspace: ", W, " - Artifact: ", A ," - ArtifactId: ", ArtID).
+   //!createBody.
 
-+focused(W,A,ArtId): true <-
-	.print("Workspace: ", W, " - Artifact: ", A ," - ArtifactId: ", ArtID).
+//INIZIO ---- BELIEF DINAMICI
++here(X,Y,Z) <-
+   .print("Il mio corpo si trova qui: ", X, ", ", Y, ", ", Z).
 
-+online_status(C) <-
-	if (C = true){
-		.print("WEBSOCKET COLLEGATA")
-	} else {
-		.print("WEBSOCKET NON COLLEGATA")
-	}.
-	
-+linked_to_body_status(C) <-
-	if (C = true){
-		.print("CORPO COLLEGATO");
-	} else {
-		.print("CORPO NON COLLEGATO")
-	}.
-	
-+new_message(S,R,C,P) <- 
-   .print("NUOVO MESSAGGIO --> Sender: ", S, " - Receiver: ", R, " - Content:", C, " - Parametri:", P).
++onMouseExit(P,L) : .list(L) <-
+   .print("Il mouse è uscito ", P);
+   .length(L,X);
+   .print("Lughezza della lista: ", X).
+ 
++onMouseExit(P,L) <-
+   .print(L).
+//FINE ---- BELIEF DINAMICI
 
-+!setupWebSocketArtifact : nervousware_url(U) & endpoint_path(P) <- 
-	.my_name(Me)
-	.concat("websocket_",Me,ArtifactName);
-	makeArtifact(ArtifactName,"artifacts.SimpleAgentArtifact",[Me,U,P],Id);
-	focus(Id).
-	
-+!sendAction: online_status(C1) & C1 = true & linked_to_body_status(C2) & C2 = true <-
++!createBody:
+   synapsis_url(U) & 
+   synapsis_endpoint_path(P) & 
+   synapsis_body_class(C) & 
+   synapsis_body_base_name(N) & 
+   reconnection_attempts(V) <-
+   .my_name(Me);
+   createSynapsisBody(Me,U,E,V,C,Id);
+   focus(Id).
+   
++!personalSend: synapsis_body_status(C1) & C1 = true <-
    azionePersonalizzata;
    .wait(3000);
-   !!sendAction.
+   !!personalSend.
 
--!sendAction <-
+-!personalSend <-
    .wait(3000);
-   !!sendAction.
+   !!personalSend.
 
-	
+// inclusione dell'asl che contenente belief e plan di base per synapsis
+// è possibile collegare anche un file asl all'interno di un JAR
+{ include("synapsis.asl") } 
+
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }
-
-// uncomment the include below to have an agent compliant with its organisation
-//{ include("$moiseJar/asl/org-obedient.asl") }

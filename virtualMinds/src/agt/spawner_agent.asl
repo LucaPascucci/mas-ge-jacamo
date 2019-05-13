@@ -9,8 +9,8 @@
 
 +!agentsnumber(N) : N > 0 <-
 	.print("crea agente ", N);
-	.concat("alone",N,W);
-	.create_agent(W,"/src/agt/alone_agent.asl");
+	.concat("simple",N,W);
+	.create_agent(W,"/src/agt/simple_agent.asl");
 	!agentsnumber(N-1).
 
 -!agentsnumber(N) : true <-

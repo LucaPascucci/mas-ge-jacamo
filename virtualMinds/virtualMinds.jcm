@@ -20,8 +20,13 @@
 
 mas virtualMinds { 
 
-// agent sample_agent
+   agent test1 : simple_agent.asl 
 
-agent test1 : simple_agent.asl 
-
+   workspace synapsis { 
+      artifact synapsisFactory : synapsisLibrary.SynapsisBodyFactory ( ) { 
+         //focused-by : test1 
+      }
+      
+      //agents: test1
+   } 
 }

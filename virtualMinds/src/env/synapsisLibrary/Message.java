@@ -1,4 +1,4 @@
-package webSocketLibrary;
+package synapsisLibrary;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Classe che rappresenta il messaggio scambiato con il middleware
  */
-public class Message {
+class Message {
 
    /**
     * Mittente
@@ -152,6 +152,10 @@ public class Message {
 
    public void setTimeStats(LinkedList<Long> timeStats) {
       this.timeStats = timeStats;
+   }
+   
+   public void addParameter(Object param) {
+      this.parameters.add(param);
    }
 
    public void addTimeStat(long time) {
