@@ -22,11 +22,11 @@ mas virtualMinds {
 
    agent test1 : simple_agent.asl 
 
-   workspace synapsis { 
+   /*workspace synapsis { 
       artifact synapsisFactory : synapsisLibrary.SynapsisBodyFactory ( ) { 
          //focused-by : test1 
       }
       
       //agents: test1
-   } 
+   } */
 }

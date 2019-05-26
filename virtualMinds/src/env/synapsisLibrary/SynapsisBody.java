@@ -30,19 +30,18 @@ public abstract class SynapsisBody extends Artifact {
 
    public String agentName;
 
-   protected void init(final String agentName, final String url, final String endpointPath,
-         final int reconnectionAttempts) {
+   protected void init(final String agentName, final String url, final String endpointPath, final int reconnectionAttempts) {
       this.agentName = agentName;
       this.defineObsProperty(SYNAPSIS_BODY_STATUS, false);
 
       this.webSocket = new SynapsisWebSocket(url, endpointPath, reconnectionAttempts);
    }
    
-   protected void doAction(String action, ArrayList<Object> params) {
+   protected void doAction(final String action, final ArrayList<Object> params) {
       this.webSocket.sendMessage(new Message(this.agentName, this.agentName, action, params));
    }
 
-   private void incomingMessage(Message message) {
+   private void incomingMessage(final Message message) {
       /*
        * Begins an external use session of the artifact. Method to be called by
        * external threads (not agents) before starting calling methods on the
@@ -50,7 +49,7 @@ public abstract class SynapsisBody extends Artifact {
        */
       this.beginExternalSession();
       
-      // Prelevo i parametri e li converto in array di Object
+      // Prelevo i parametri e li converto in array di Object cosi da renderli facilmente utilizzabili su JASON
       Object[] params = new Object[message.getParameters().size()];
       params = message.getParameters().toArray(params);
       
@@ -70,13 +69,13 @@ public abstract class SynapsisBody extends Artifact {
 
    }
 
-   private void changeBodyStatus(boolean status) {
+   private void changeBodyStatus(final boolean status) {
       this.beginExternalSession();
       this.updateObsProperty(SYNAPSIS_BODY_STATUS, status);
       this.endExternalSession(true);
    }
 
-   private void printLog(String log) {
+   private void printLog(final String log) {
       this.beginExternalSession();
       System.out.println("[SynapsisBody - " + this.agentName + "] " + log);
       this.endExternalSession(true);
@@ -86,8 +85,8 @@ public abstract class SynapsisBody extends Artifact {
    public class SynapsisWebSocket extends ReconnectHandler {
       
       private static final String SYNAPSIS_MIDDLEWARE = "SynapsisMiddleware";
-      private static final String SYNAPSIS_MIDDLEWARE_ROOM_READY = "RoomReady";
-      private static final String SYNAPSIS_MIDDLEWARE_ROOM_UNREADY = "RoomUnready";
+      private static final String SYNAPSIS_MIDDLEWARE_READY = "SynapsisMiddlewareReady";
+      private static final String SYNAPSIS_MIDDLEWARE_UNREADY = "SynapsisMiddlewareUnready";
       private static final String ENTITY_PATH = "brain/";
       private ClientManager clientManager;
       private Session session;
@@ -107,10 +106,9 @@ public abstract class SynapsisBody extends Artifact {
             clientManager.getProperties().put(ClientProperties.RECONNECT_HANDLER,SynapsisWebSocket.this);
             // La connessione avviene in un thread separato rispetto a quello dell'artefatto
             this.clientManager.asyncConnectToServer(SynapsisWebSocket.this, new URI(url + endpointPath + ENTITY_PATH + agentName));
-            //this.clientManager.asyncConnectToServer(this, new URI("ws://localhost:8025/synapsis/service/brain/test1"));
+            //this.clientManager.asyncConnectToServer(SynapsisWebSocket.this, new URI("ws://synapsis-middleware.herokuapp.com/"+ endpointPath + ENTITY_PATH + agentName));
          } catch (DeploymentException | URISyntaxException e1) {
             e1.printStackTrace();
-            // TODO quindi?? cosa faccio??
          }
       }
 
@@ -124,15 +122,18 @@ public abstract class SynapsisBody extends Artifact {
 
       @OnMessage
       public void onMessage(String JSONmessage, Session session) { // Tyrus utilizza un thread secondario per la ricezione di messaggi
+         long currentMills = System.currentTimeMillis();
          Message message = Message.buildMessage(JSONmessage);
+         message.addTimeStat(currentMills);
+         printLog("onMessage: " + message.toString());
 
          if (message.getSender().equals(SYNAPSIS_MIDDLEWARE)) {
             switch (message.getContent()) {
-            case SYNAPSIS_MIDDLEWARE_ROOM_READY:
+            case SYNAPSIS_MIDDLEWARE_READY:
                this.status = ConnectionStatus.SYNAPSIS_BODY_CONNECTED;
                this.rifleMessagesToSend();
                break;
-            case SYNAPSIS_MIDDLEWARE_ROOM_UNREADY:
+            case SYNAPSIS_MIDDLEWARE_UNREADY:
                this.status = ConnectionStatus.SYNAPSIS_BODY_DISCONNECTED;
             }
          } else {
@@ -152,17 +153,17 @@ public abstract class SynapsisBody extends Artifact {
          this.status = ConnectionStatus.SYNAPSIS_DISCONNECTED;
          changeBodyStatus(false);
          printLog("OnError: Sessione:" + session.getId() + " - messaggio: " + error.getMessage());
-         error.printStackTrace();
+         // error.printStackTrace();
       }
 
       public void sendMessage(final Message message) {
          if (this.status.equals(ConnectionStatus.SYNAPSIS_BODY_CONNECTED)) {
-            message.addTimeStat(System.currentTimeMillis());
             try {
+               message.addTimeStat(System.currentTimeMillis());
                this.session.getBasicRemote().sendText(message.toString());
             } catch (IOException e) {
                this.messagesToSend.add(message);
-               e.printStackTrace(); //Cosa succedee? //TODO guardare su tyrus
+               e.printStackTrace();
 
             }
          } else {
@@ -196,7 +197,7 @@ public abstract class SynapsisBody extends Artifact {
          this.attempt++;
          if (this.reconnectionAttempts >= this.attempt) {
             printLog("onConnectFailure - messaggio: " + exception.toString() + " --> Tentativo riconnesione " + this.attempt);
-            exception.printStackTrace();
+            // exception.printStackTrace();
             return true;
          } else {   
          return false;

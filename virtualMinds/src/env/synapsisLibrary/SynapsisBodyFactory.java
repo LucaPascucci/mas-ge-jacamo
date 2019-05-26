@@ -16,7 +16,6 @@ public class SynapsisBodyFactory extends Artifact {
       try {
          res.set(this.makeArtifact(SYNAPSIS_BODY_BASE_NAME + agentName, synapsisBodyClass, config));
       } catch (OperationException e) {
-         // TODO Auto-generated catch block
          e.printStackTrace();
       }
    }

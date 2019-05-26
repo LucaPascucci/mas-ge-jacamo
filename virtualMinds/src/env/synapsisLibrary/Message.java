@@ -51,11 +51,11 @@ class Message {
     */
    public Message(final String sender, final String receiver, final String content,
          final ArrayList<Object> parameters) {
-      this.sender = sender;
-      this.receiver = receiver;
-      this.content = content;
-      this.parameters = parameters;
-      this.timeStats = new LinkedList<Long>();
+      this.setSender(sender);
+      this.setReceiver(receiver);
+      this.setContent(content);
+      this.setParameters(parameters);
+      this.setTimeStats(new LinkedList<Long>());
    }
 
    /**
@@ -70,11 +70,11 @@ class Message {
     */
    public Message(final String sender, final String receiver, final String content, final ArrayList<Object> parameters,
          final LinkedList<Long> timeStats) {
-      this.sender = sender;
-      this.receiver = receiver;
-      this.content = content;
-      this.parameters = parameters;
-      this.timeStats = timeStats;
+      this.setSender(sender);
+      this.setReceiver(receiver);
+      this.setContent(content);
+      this.setParameters(parameters);
+      this.setTimeStats(timeStats);
    }
 
    /**
@@ -91,7 +91,7 @@ class Message {
     * 
     * @param sender nome mittente
     */
-   public void setSender(String sender) {
+   public void setSender(final String sender) {
       this.sender = sender;
    }
 
@@ -109,7 +109,7 @@ class Message {
     * 
     * @param receiver nome destinatario
     */
-   public void setReceiver(String receiver) {
+   public void setReceiver(final String receiver) {
       this.receiver = receiver;
    }
 
@@ -124,14 +124,16 @@ class Message {
 
    /**
     * Imposta contenuto messaggio
+    * 
     * @param content contenuto messaggio
     */
-   public void setContent(String content) {
+   public void setContent(final String content) {
       this.content = content;
    }
 
    /**
     * Ottieni la lista di parametri collegati al contenuto
+    * 
     * @return lista di parametri
     */
    public ArrayList<Object> getParameters() {
@@ -139,26 +141,47 @@ class Message {
    }
 
    /**
+    * Imposta la lista dei parametri collegati al contenuto
     * 
-    * @param parameters
+    * @param lista di parametri
     */
-   public void setParameters(ArrayList<Object> parameters) {
+   public void setParameters(final ArrayList<Object> parameters) {
       this.parameters = parameters;
    }
 
+   /**
+    * Ottieni la lista delle statistiche temporali del messaggio
+    * 
+    * @return lista delle statistiche temporali
+    */
    public LinkedList<Long> getTimeStats() {
       return timeStats;
    }
 
-   public void setTimeStats(LinkedList<Long> timeStats) {
+   /**
+    * Imposta la lista delle statistiche temporali del messaggio
+    * 
+    * @param lista delle statistiche temporali
+    */
+   public void setTimeStats(final LinkedList<Long> timeStats) {
       this.timeStats = timeStats;
    }
-   
-   public void addParameter(Object param) {
+
+   /**
+    * Aggiungi un parametro collegato al contenuto del messaggio
+    * 
+    * @param parametro da aggiungere
+    */
+   public void addParameter(final Object param) {
       this.parameters.add(param);
    }
 
-   public void addTimeStat(long time) {
+   /**
+    * Aggiungi una statistica temporale al messaggio
+    * 
+    * @param statistica temporale
+    */
+   public void addTimeStat(final long time) {
       this.timeStats.add(time);
    }
 
@@ -177,8 +200,37 @@ class Message {
     * @param JsonMessage stringa che rappresenta il messaggio
     * @return Oggetto Messaggio costruito
     */
-   public static Message buildMessage(String JsonMessage) {
+   public static Message buildMessage(final String JsonMessage) {
       return new Gson().fromJson(JsonMessage, Message.class);
+   }
+
+   // Contenuto array --> [timestamp invio entità, timestamp ricezione su Synapsis,
+   // timestamp invio da Synapsis, timestamp ricezione entità]
+
+   private long getTimeFromSenderToSynapsis() {
+      return (this.timeStats.get(1) - this.timeStats.getFirst());
+   }
+
+   private long getSynapsisComputation() {
+      return (this.timeStats.get(2) - this.timeStats.get(1));
+   }
+
+   private long getTimeFromSynapsisToReceiver() {
+      return (this.timeStats.getLast() - this.timeStats.get(2));
+   }
+
+   private long getTotalTime() {
+      return (this.timeStats.getLast() - this.timeStats.getFirst());
+   }
+
+   // S2S = Sender to Synapsis
+   // SC = Synapsis Computation
+   // S2R = Synapsis to Receiver
+
+   public String getCalculatedTimeStats() {
+      return "Message TimeStats -> Total: " + this.getTotalTime() + " mills - S2S: "
+            + this.getTimeFromSenderToSynapsis() + " mills - SC: " + this.getSynapsisComputation() + " mills - S2R: "
+            + this.getTimeFromSynapsisToReceiver() + " mills";
    }
 
 }
