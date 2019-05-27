@@ -8,7 +8,6 @@ synapsis_body_class("artifacts.SampleAgentBody").
 
 /* Initial goals */
 
-
 !createSynapsisBody.
 !personalSend.
 
@@ -26,16 +25,6 @@ synapsis_body_class("artifacts.SampleAgentBody").
 +onMouseExit(P,L) <-
    .print(L).
 //FINE ---- BELIEF DINAMICI
-
-+!createBody:
-   synapsis_url(U) & 
-   synapsis_endpoint_path(P) & 
-   synapsis_body_class(C) & 
-   synapsis_body_base_name(N) & 
-   reconnection_attempts(V) <-
-   .my_name(Me);
-   createSynapsisBody(Me,U,E,V,C,Id);
-   focus(Id).
    
 +!personalSend: synapsis_body_status(C1) & C1 = true <-
    azionePersonalizzata;

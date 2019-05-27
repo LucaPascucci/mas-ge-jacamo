@@ -1,10 +1,9 @@
-// Agent paper_robot in project recyclingRobots
-
 /* Initial beliefs and rules */
+
 synapsis_url("ws://localhost:9000/").
 synapsis_endpoint_path("service/").
 reconnection_attempts(5).
-synapsis_body_class("atifacts.PaperRobotBody").
+synapsis_body_class("artifacts.PaperRobotBody").
 
 /* Initial goals */
 

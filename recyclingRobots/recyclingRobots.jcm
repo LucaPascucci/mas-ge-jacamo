@@ -13,9 +13,9 @@
 */
 
 mas recyclingRobots {
-
-    agent paper_robot : paper_robot.asl
-    
-    agent plastic_robot : plastic_robot.asl
+   
+   agent sample: sample_agent.asl
+   agent paperRobot : paper_robot.asl
+   agent plasticRobot : plastic_robot.asl
 }
 
