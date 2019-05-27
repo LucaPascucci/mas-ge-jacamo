@@ -52,7 +52,7 @@ synapsis_body_class("artifacts.SimpleAgentBody").
 
 // inclusione dell'asl che contenente belief e plan di base per synapsis
 // è possibile collegare anche un file asl all'interno di un JAR
-{ include("synapsis.asl") } 
+{ include("synapsisJaCaMo/synapsis_base_agent.asl") } 
 
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }

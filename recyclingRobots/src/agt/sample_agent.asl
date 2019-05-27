@@ -46,9 +46,8 @@ synapsis_body_class("artifacts.SampleAgentBody").
    .wait(3000);
    !!personalSend.
    
-// inclusione dell'asl che contenente belief e plan di base per synapsis
-// è possibile collegare anche un file asl all'interno di un JAR
-{ include("jar:file:/Users/luca/mas-ge-jacamo/recyclingRobots/lib/synapsis-mind.jar!/agt/synapsis.asl") } 
+// inclusione dell'asl che contenente belief e plan di base per synapsis. è possibile collegare anche un file asl all'interno di un JAR
+{ include("jar:file:/Users/luca/mas-ge-jacamo/recyclingRobots/lib/SynapsisJaCaMo.jar!/agt/synapsisJaCaMo/synapsis_base_agent.asl") } 
 
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }

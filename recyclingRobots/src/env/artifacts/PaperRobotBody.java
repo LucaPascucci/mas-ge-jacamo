@@ -1,9 +1,9 @@
 // CArtAgO artifact code for project recyclingRobots
 
-package recyclingRobots;
+package artifacts;
 
 import cartago.*;
-import synapsisLibrary.SynapsisBody;
+import synapsisJaCaMo.SynapsisBody;
 
 public class PaperRobotBody extends SynapsisBody {
    

@@ -1,4 +1,4 @@
-package synapsisLibrary;
+package synapsisJaCaMo;
 
 public enum ConnectionStatus {
    SYNAPSIS_CONNECTED, SYNAPSIS_BODY_CONNECTED, SYNAPSIS_BODY_DISCONNECTED, SYNAPSIS_DISCONNECTED;

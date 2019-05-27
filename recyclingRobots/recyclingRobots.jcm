@@ -14,9 +14,8 @@
 
 mas recyclingRobots {
 
-    // agent test1 : sample_agent.asl 
-
     agent paper_robot : paper_robot.asl
+    
     agent plastic_robot : plastic_robot.asl
 }
 

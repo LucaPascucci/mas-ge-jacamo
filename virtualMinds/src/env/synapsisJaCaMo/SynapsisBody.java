@@ -1,4 +1,4 @@
-package synapsisLibrary;
+package synapsisJaCaMo;
 
 import java.io.IOException;
 import java.net.URI;

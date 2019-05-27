@@ -3,7 +3,7 @@ package artifacts;
 import java.util.ArrayList;
 
 import cartago.*;
-import synapsisLibrary.SynapsisBody;
+import synapsisJaCaMo.SynapsisBody;
 
 public class SimpleAgentBody extends SynapsisBody {
    
