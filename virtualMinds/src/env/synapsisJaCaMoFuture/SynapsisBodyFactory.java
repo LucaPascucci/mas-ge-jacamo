@@ -1,6 +1,6 @@
 // CArtAgO artifact code for project virtualMinds
 
-package synapsisJaCaMo;
+package synapsisJaCaMoFuture;
 
 import cartago.*;
 

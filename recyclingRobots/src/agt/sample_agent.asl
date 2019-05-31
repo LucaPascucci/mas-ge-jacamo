@@ -1,7 +1,6 @@
 /* Initial beliefs and rules */
 
 synapsis_url("ws://localhost:9000/").
-synapsis_endpoint_path("service/").
 reconnection_attempts(5).
 synapsis_body_class("artifacts.SampleAgentBody").
 
@@ -9,7 +8,6 @@ synapsis_body_class("artifacts.SampleAgentBody").
 /* Initial goals */
 
 !createSynapsisBody.
-!personalSend.
 
 /* Plans */
 
@@ -25,13 +23,14 @@ synapsis_body_class("artifacts.SampleAgentBody").
 +onMouseExit(P,L) <-
    .print(L).
 //FINE ---- BELIEF DINAMICI
-   
-+!personalSend: synapsis_body_status(C1) & C1 = true <-
-   azionePersonalizzata;
-   .wait(3000);
-   !!personalSend.
 
--!personalSend <-
++!startMind <-
+   .my_name(Me);
+   .print(Me," Avviato");
+   !personalSend.
+   
++!personalSend <-
+   azionePersonalizzata;
    .wait(3000);
    !!personalSend.
    

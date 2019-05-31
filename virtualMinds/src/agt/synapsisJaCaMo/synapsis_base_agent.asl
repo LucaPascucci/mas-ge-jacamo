@@ -1,36 +1,33 @@
-// Synapsis base agent
+// Synapsis base agent --> Agente che deve essere incluso per creare ed utilizzare Synapsis Body
 
 /* Initial beliefs and rules */
-synapsis_body_base_name("synapsis_").
+synapsis_body_base_name("synapsis_body_").
 
 /* Initial goals */
 
-/* Plans */
+/* Plans */  
 
-//+joined(W,_) <-
-//  .print("Entrato nel workspace ",W).
-
-//+focused(W,A,ArtId) <-
-//  .print("Focused --> Workspace: ", W, " - Artifact: ", A ," - ArtifactId: ", ArtID).
-
-+synapsis_body_status(C) <-
-   if (C = true){
-      .print("Synapsis - middleware --> COLLEGATO")
-   } else {
-      .print("Synapsis - middleware --> NON COLLEGATO")
-   }.
++synapsis_body_status(C): C = true <-
+   .print("Synapsis Body pronto");
+   !!startMind.
+  
+//Va sovrascritto per ogni agente che vuole utilizzare i Synapsis Body
++!startMind <-
+   .my_name(Me);
+   .print("Sovrascrivere plan +!startMind nell'agente ", Me).
 
 +!createSynapsisBody : 
    synapsis_url(U) & 
-   synapsis_endpoint_path(P) & 
    synapsis_body_class(C) & 
    synapsis_body_base_name(N) & 
    reconnection_attempts(V) <-
    .my_name(Me)
    .concat(N,Me,ArtifactName);
-   makeArtifact(ArtifactName,C,[Me,U,P,V],Id);
+   makeArtifact(ArtifactName,C,[Me,U,V],Id);
    focus(Id).
    
--!createSynapsisBody <-
-   .print("Creazione di Artefatto fallita!!").
+-!createSynapsisBody : synapsis_body_base_name(N) <-
+   .my_name(Me)
+   .concat(N,Me,ArtifactName);
+   .print("Creazione dell'artefatto ", N ," fallita!!").
 

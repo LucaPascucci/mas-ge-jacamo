@@ -1,7 +1,6 @@
 /* Initial beliefs and rules */
 
 synapsis_url("ws://localhost:9000/").
-synapsis_endpoint_path("service/").
 reconnection_attempts(5).
 synapsis_body_class("artifacts.PlasticRobotBody").
 
@@ -17,12 +16,9 @@ synapsis_body_class("artifacts.PlasticRobotBody").
    //controllare se è occupata
    //andare dalla spazzatura
    
-+synapsis_body_status(C): C = true <-
-  !!work.
-   
 //FINE ---- BELIEF DINAMICI
 
-+!work : true <-
++!startMind : true <-
    .print("Inizio a lavorare");
    !!recycle.
  

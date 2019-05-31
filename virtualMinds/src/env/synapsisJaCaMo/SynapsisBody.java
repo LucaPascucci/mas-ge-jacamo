@@ -30,11 +30,11 @@ public abstract class SynapsisBody extends Artifact {
 
    public String agentName;
 
-   protected void init(final String agentName, final String url, final String endpointPath, final int reconnectionAttempts) {
+   protected void init(final String agentName, final String url, final int reconnectionAttempts) {
       this.agentName = agentName;
       this.defineObsProperty(SYNAPSIS_BODY_STATUS, false);
 
-      this.webSocket = new SynapsisWebSocket(url, endpointPath, reconnectionAttempts);
+      this.webSocket = new SynapsisWebSocket(url, reconnectionAttempts);
    }
    
    protected void doAction(final String action, final ArrayList<Object> params) {
@@ -87,7 +87,9 @@ public abstract class SynapsisBody extends Artifact {
       private static final String SYNAPSIS_MIDDLEWARE = "SynapsisMiddleware";
       private static final String SYNAPSIS_MIDDLEWARE_READY = "SynapsisMiddlewareReady";
       private static final String SYNAPSIS_MIDDLEWARE_UNREADY = "SynapsisMiddlewareUnready";
+      private static final String SYNAPSIS_ENDPOINT = "synapsiservice/";
       private static final String ENTITY_PATH = "brain/";
+      
       private ClientManager clientManager;
       private Session session;
       private ConnectionStatus status;
@@ -95,7 +97,7 @@ public abstract class SynapsisBody extends Artifact {
       private int reconnectionAttempts;
       private int attempt;
 
-      public SynapsisWebSocket(final String url, final String endpointPath, final int reconnectionAttempts) {
+      public SynapsisWebSocket(final String url, final int reconnectionAttempts) {
          this.status = ConnectionStatus.SYNAPSIS_DISCONNECTED;
          this.clientManager = ClientManager.createClient();
          this.messagesToSend = new ConcurrentLinkedQueue<>();
@@ -105,11 +107,12 @@ public abstract class SynapsisBody extends Artifact {
          try {
             clientManager.getProperties().put(ClientProperties.RECONNECT_HANDLER,SynapsisWebSocket.this);
             // La connessione avviene in un thread separato rispetto a quello dell'artefatto
-            this.clientManager.asyncConnectToServer(SynapsisWebSocket.this, new URI(url + endpointPath + ENTITY_PATH + agentName));
-            //this.clientManager.asyncConnectToServer(SynapsisWebSocket.this, new URI("ws://synapsis-middleware.herokuapp.com/"+ endpointPath + ENTITY_PATH + agentName));
+            this.clientManager.asyncConnectToServer(SynapsisWebSocket.this, new URI(url + SYNAPSIS_ENDPOINT + ENTITY_PATH + agentName));
+            //this.clientManager.asyncConnectToServer(SynapsisWebSocket.this, new URI("ws://synapsis-middleware.herokuapp.com/"+ SYNAPSIS_ENDPOINT + ENTITY_PATH + agentName));
          } catch (DeploymentException | URISyntaxException e1) {
             e1.printStackTrace();
          }
+         changeBodyStatus(true);
       }
 
       @OnOpen
@@ -117,7 +120,6 @@ public abstract class SynapsisBody extends Artifact {
          this.session = session;
          this.attempt = 0;
          this.status = ConnectionStatus.SYNAPSIS_CONNECTED;
-         changeBodyStatus(true);
       }
 
       @OnMessage
@@ -144,14 +146,12 @@ public abstract class SynapsisBody extends Artifact {
       @OnClose
       public void onClose(CloseReason reason, Session session) { // Tyrus utilizza un thread secondario
          this.status = ConnectionStatus.SYNAPSIS_DISCONNECTED;
-         changeBodyStatus(false);
          printLog("onClose: Sessione: " + session.getId() + " - messaggio: " + reason.getReasonPhrase());
       }
 
       @OnError
       public void onError(Session session, Throwable error) { // Tyrus utilizza un thread secondario
          this.status = ConnectionStatus.SYNAPSIS_DISCONNECTED;
-         changeBodyStatus(false);
          printLog("OnError: Sessione:" + session.getId() + " - messaggio: " + error.getMessage());
          // error.printStackTrace();
       }
@@ -200,9 +200,8 @@ public abstract class SynapsisBody extends Artifact {
             // exception.printStackTrace();
             return true;
          } else {   
-         return false;
+            return false;
          }
       }
-
    }
 }
