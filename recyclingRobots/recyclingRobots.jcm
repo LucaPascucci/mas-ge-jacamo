@@ -14,8 +14,10 @@
 
 mas recyclingRobots {
    
-   agent sample: sample_agent.asl
-   agent paperRobot : paper_robot.asl
-   agent plasticRobot : plastic_robot.asl
+   agent paper_robot: paper_robot.asl
+   agent glass_robot: glass_robot.asl
+   agent plastic_robot: plastic_robot.asl
+   
+   agent garbage_spawner: garbage_spawner.asl
 }
 

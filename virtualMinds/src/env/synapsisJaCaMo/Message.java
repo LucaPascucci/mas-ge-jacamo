@@ -49,8 +49,7 @@ class Message {
     * @param content    Breve contenuto del messaggio
     * @param parameters Lista di parametri collegati al contenuto
     */
-   public Message(final String sender, final String receiver, final String content,
-         final ArrayList<Object> parameters) {
+   public Message(final String sender, final String receiver, final String content, final ArrayList<Object> parameters) {
       this.setSender(sender);
       this.setReceiver(receiver);
       this.setContent(content);
@@ -68,8 +67,7 @@ class Message {
     * @param timeStats  Lista che memorizza i tempi di invio e ricezione del
     *                   messaggio
     */
-   public Message(final String sender, final String receiver, final String content, final ArrayList<Object> parameters,
-         final LinkedList<Long> timeStats) {
+   public Message(final String sender, final String receiver, final String content, final ArrayList<Object> parameters, final LinkedList<Long> timeStats) {
       this.setSender(sender);
       this.setReceiver(receiver);
       this.setContent(content);
@@ -228,9 +226,8 @@ class Message {
    // S2R = Synapsis to Receiver
 
    public String getCalculatedTimeStats() {
-      return "Message TimeStats -> Total: " + this.getTotalTime() + " mills - S2S: "
-            + this.getTimeFromSenderToSynapsis() + " mills - SC: " + this.getSynapsisComputation() + " mills - S2R: "
-            + this.getTimeFromSynapsisToReceiver() + " mills";
+      return "Message TimeStats -> Total: " + this.getTotalTime() + " mills - S2S: " + this.getTimeFromSenderToSynapsis() + " mills - SC: "
+            + this.getSynapsisComputation() + " mills - S2R: " + this.getTimeFromSynapsisToReceiver() + " mills";
    }
 
 }

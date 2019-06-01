@@ -9,8 +9,8 @@ public class SimpleAgentBody extends SynapsisBody {
    
    private int counter = 0;
 
-   protected void init(final String agentName, final String url, final int reconnectionAttempts) {
-      super.init(agentName, url, reconnectionAttempts);
+   protected void init(final String name, final String url, final int reconnectionAttempts) {
+      super.init(name, url, reconnectionAttempts);
    }
 
    @OPERATION

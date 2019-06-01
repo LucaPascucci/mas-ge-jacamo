@@ -1,7 +1,9 @@
+// Agent glass_robot in project recyclingRobots
+
 /* Beliefs per synapsis */
 synapsis_url("ws://localhost:9000/").
 reconnection_attempts(5).
-synapsis_body_class("artifacts.PaperRobotBody").
+synapsis_body_class("artifacts.GlassRobotBody").
 
 /* Initial goals */
 

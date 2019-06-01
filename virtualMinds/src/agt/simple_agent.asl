@@ -19,8 +19,6 @@ synapsis_body_class("artifacts.SimpleAgentBody").
    .length(L,X);
    .print("Lughezza della lista: ", X).
  
-+onMouseExit(P,L) <-
-   .print(L).
 //FINE ---- BELIEF DINAMICI
 
 +!startMind <-
@@ -28,18 +26,11 @@ synapsis_body_class("artifacts.SimpleAgentBody").
    .print(Me," Avviato");
    !!personalSend.
 
-+!personalSend: synapsis_body_status(C1) & C1 = true <-
++!personalSend <-
    azionePersonalizzata;
    .wait(3000);
    !!personalSend.
-
--!personalSend <-
-   .wait(3000);
-   !!personalSend.
-
+   
 // inclusione dell'asl che contenente belief e plan di base per synapsis
 // è possibile collegare anche un file asl all'interno di un JAR
 { include("synapsisJaCaMo/synapsis_base_agent.asl") } 
-
-{ include("$jacamoJar/templates/common-cartago.asl") }
-{ include("$jacamoJar/templates/common-moise.asl") }

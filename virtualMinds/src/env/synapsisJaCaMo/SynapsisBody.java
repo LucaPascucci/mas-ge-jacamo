@@ -28,17 +28,17 @@ public abstract class SynapsisBody extends Artifact {
 
    private SynapsisWebSocket webSocket;
 
-   public String agentName;
+   public String name;
 
-   protected void init(final String agentName, final String url, final int reconnectionAttempts) {
-      this.agentName = agentName;
+   protected void init(final String name, final String url, final int reconnectionAttempts) {
+      this.name = name;
       this.defineObsProperty(SYNAPSIS_BODY_STATUS, false);
 
       this.webSocket = new SynapsisWebSocket(url, reconnectionAttempts);
    }
    
    protected void doAction(final String action, final ArrayList<Object> params) {
-      this.webSocket.sendMessage(new Message(this.agentName, this.agentName, action, params));
+      this.webSocket.sendMessage(new Message(this.name, this.name, action, params));
    }
 
    private void incomingMessage(final Message message) {
@@ -77,7 +77,7 @@ public abstract class SynapsisBody extends Artifact {
 
    private void printLog(final String log) {
       this.beginExternalSession();
-      System.out.println("[SynapsisBody - " + this.agentName + "] " + log);
+      System.out.println("[SynapsisBody - " + this.name + "] " + log);
       this.endExternalSession(true);
    }
 
@@ -107,7 +107,7 @@ public abstract class SynapsisBody extends Artifact {
          try {
             clientManager.getProperties().put(ClientProperties.RECONNECT_HANDLER,SynapsisWebSocket.this);
             // La connessione avviene in un thread separato rispetto a quello dell'artefatto
-            this.clientManager.asyncConnectToServer(SynapsisWebSocket.this, new URI(url + SYNAPSIS_ENDPOINT + ENTITY_PATH + agentName));
+            this.clientManager.asyncConnectToServer(SynapsisWebSocket.this, new URI(url + SYNAPSIS_ENDPOINT + ENTITY_PATH + name));
             //this.clientManager.asyncConnectToServer(SynapsisWebSocket.this, new URI("ws://synapsis-middleware.herokuapp.com/"+ SYNAPSIS_ENDPOINT + ENTITY_PATH + agentName));
          } catch (DeploymentException | URISyntaxException e1) {
             e1.printStackTrace();

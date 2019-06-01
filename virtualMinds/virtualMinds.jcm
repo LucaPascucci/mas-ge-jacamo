@@ -20,13 +20,7 @@
 
 mas virtualMinds { 
 
-   agent test1 : simple_agent.asl 
-
-   /*workspace synapsis { 
-      artifact synapsisFactory : synapsisLibrary.SynapsisBodyFactory ( ) { 
-         //focused-by : test1 
-      }
-      
-      //agents: test1
-   } */
+   agent spawn_garbage : spawn_garbage.asl 
+   agent spawn_test : spawn_test.asl 
+   
 }

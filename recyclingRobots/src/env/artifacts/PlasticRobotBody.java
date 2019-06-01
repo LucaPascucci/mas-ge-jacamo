@@ -13,7 +13,7 @@ public class PlasticRobotBody extends SynapsisBody {
    
    @OPERATION
    void searchGarbage() {
-      this.doAction("Cerca spazzatura", new ArrayList<>());
+      this.doAction("search_garbage", new ArrayList<>());
    }
 }
 
