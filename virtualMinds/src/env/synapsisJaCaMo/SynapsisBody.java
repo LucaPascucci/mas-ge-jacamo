@@ -3,7 +3,9 @@ package synapsisJaCaMo;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -77,7 +79,8 @@ public abstract class SynapsisBody extends Artifact {
 
    private void printLog(final String log) {
       this.beginExternalSession();
-      System.out.println("[SynapsisBody - " + this.name + "] " + log);
+      String time = new SimpleDateFormat("HH:mm:ss").format(new Date()); // 12:08:43
+      System.out.println("[Synapsis - Body_" +this.name + " - "+ time +"]: " + log);
       this.endExternalSession(true);
    }
 
