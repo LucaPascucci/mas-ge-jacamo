@@ -9,7 +9,7 @@ reconnection_attempts(5).
 
 /* Initial goals */
 
-!spawnSynapsisBody(20).
+!spawnSynapsisBody(1).
 
 // inclusione dell'asl che contenente belief e plan di base per synapsis. è possibile collegare anche un file asl all'interno di un JAR
 { include("jar:file:/Users/luca/mas-ge-jacamo/recyclingRobots/lib/SynapsisJaCaMo.jar!/agt/synapsisJaCaMo/spawner_synapsis_bodies.asl") } 

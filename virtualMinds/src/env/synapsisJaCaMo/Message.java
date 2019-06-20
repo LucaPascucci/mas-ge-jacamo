@@ -40,6 +40,22 @@ class Message {
     */
    @SerializedName("TimeStats")
    private LinkedList<Long> timeStats;
+   
+   /**
+    * Costruttore
+    * 
+    * @param sender     Mittente
+    * @param receiver   Destinatario
+    * @param content    Breve contenuto del messaggio
+    * @param parameters Lista di parametri collegati al contenuto
+    */
+   public Message(final String sender, final String receiver, final String content) {
+      this.setSender(sender);
+      this.setReceiver(receiver);
+      this.setContent(content);
+      this.setParameters(new ArrayList<Object>());
+      this.setTimeStats(new LinkedList<Long>());
+   }
 
    /**
     * Costruttore
@@ -202,8 +218,7 @@ class Message {
       return new Gson().fromJson(JsonMessage, Message.class);
    }
 
-   // Contenuto array --> [timestamp invio entità, timestamp ricezione su Synapsis,
-   // timestamp invio da Synapsis, timestamp ricezione entità]
+   // Contenuto array --> [timestamp invio entità, timestamp ricezione su Synapsis, timestamp invio da Synapsis, timestamp ricezione entità]
 
    private long getTimeFromSenderToSynapsis() {
       return (this.timeStats.get(1) - this.timeStats.getFirst());

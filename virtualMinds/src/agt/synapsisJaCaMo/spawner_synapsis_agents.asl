@@ -1,4 +1,4 @@
-// Synapsis agent spawner --> Agente permette la creazione di agenti
+// Synapsis mind spawner --> Agente permette la creazione di agenti
 
 /* Belief di esempio
  * 
@@ -20,18 +20,20 @@
    !!createSynapsisAgent(N);
 	!spawnSynapsisAgent(N-1).
 
-+!createSynapsisAgent(N): synapsis_agent_base_name(BaseName) & synapsis_agent_path(Path) <-
-   .concat(BaseName,N,AgentName);
-   .create_agent(AgentName,Path);
-   .concat("Creato ", AgentName, Message);
-   !logMessage(Message).
-   
-
 +!spawnSynapsisAgent(N): N = 0 <-
 	!logMessage("Conclusa creazione synapsis agents").
 
 -!spawnSynapsisAgent <-
    !logMessage("Errore durante la creazione di agenti").
+   
++!createSynapsisAgent(N): synapsis_agent_base_name(BaseName) & synapsis_agent_path(Path) <-
+   .concat(BaseName,N,AgentName);
+   .create_agent(AgentName,Path);
+   .concat("Creato ", AgentName, Message);
+   !logMessage(Message).
+
+-!createSynapsisAgent <-
+   !logMessage("Errore durante la creazione di un agenti").
    
 +!logMessage(Message) <- 
    .time(H,M,S);

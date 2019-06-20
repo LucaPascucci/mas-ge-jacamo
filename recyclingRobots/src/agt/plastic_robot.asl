@@ -5,6 +5,7 @@ synapsis_body_class("artifacts.PlasticRobotBody").
 
 /* Goal iniziale per synapsis */
 !createSynapsisBody.
+!myMockEntity.
 
 /* Plans */
 
@@ -17,7 +18,7 @@ synapsis_body_class("artifacts.PlasticRobotBody").
 
 //INIZIO ---- BELIEF DINAMICI
 +found_garbage(Name) <- //trovata spazzatura --> Name (gameobject)
-   .print("Devo fare focus sull'artefatto").
+   .print("Devo fare focus sull'artefatto --> ", Name).
    //focus sull'artefatto 
 
 +found_bin(Name) <-
@@ -27,6 +28,10 @@ synapsis_body_class("artifacts.PlasticRobotBody").
    !!recycle.
 
 //FINE ---- BELIEF DINAMICI
+
++!myMockEntity <-
+   .my_name(Me);
+   !createMockEntity("PlasticRobotMock",Me).
 
 /* Plan per synapsis */
 +!startMind : true <-
@@ -62,8 +67,6 @@ synapsis_body_class("artifacts.PlasticRobotBody").
 -!recycle <-
    .print("Sono libero... cerco della spazzatura");
    searchGarbage. //azione per cercare spazzatura
-
-       
 
 // inclusione dell'asl che contenente belief e plan di base per synapsis. è possibile collegare anche un file asl all'interno di un JAR
 { include("jar:file:/Users/luca/mas-ge-jacamo/recyclingRobots/lib/SynapsisJaCaMo.jar!/agt/synapsisJaCaMo/synapsis_base_agent.asl") } 

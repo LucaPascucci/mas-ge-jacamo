@@ -6,25 +6,34 @@ synapsis_body_class("artifacts.SimpleAgentBody").
 
 /* Initial goals */
 
+
 !createSynapsisBody.
+!myMockEntity.
 
 /* Plans */
 
 //INIZIO ---- BELIEF DINAMICI
++synapsis_counterpart_status(C) <-
+   if (C == true){
+      !logMessage("Controparte collegata");
+      !!personalSend;
+   } else {
+      !logMessage("Controparte non collegata");
+   }.
+   
++risposta_automatica(X,Y,Z) <-
+   if (Y == false){
+      .print("Arrivata la risposta automatica -> valori: ",X, " - ", Y ," - ", Z );
+   }.
+   
 +here(X,Y,Z) <-
    .print("Il mio corpo si trova qui: ", X, ", ", Y, ", ", Z).
-
-+onMouseExit(P,L) : .list(L) <-
-   .print("Il mouse è uscito ", P);
-   .length(L,X);
-   .print("Lughezza della lista: ", X).
  
 //FINE ---- BELIEF DINAMICI
 
-+!startMind <-
++!myMockEntity <-
    .my_name(Me);
-   .print(Me," Avviato");
-   !!personalSend.
+   !createMockEntity("TestMock",Me).
 
 +!personalSend <-
    azionePersonalizzata;

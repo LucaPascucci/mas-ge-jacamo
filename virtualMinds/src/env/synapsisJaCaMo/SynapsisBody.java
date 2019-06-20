@@ -1,6 +1,7 @@
 package synapsisJaCaMo;
 
 import java.io.IOException;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
@@ -22,25 +23,61 @@ import org.glassfish.tyrus.client.ClientManager;
 import org.glassfish.tyrus.client.ClientManager.ReconnectHandler;
 import org.glassfish.tyrus.client.ClientProperties;
 
-import cartago.*;
+import cartago.Artifact;
+import cartago.OPERATION;
 
 public abstract class SynapsisBody extends Artifact {
 
-   private static final String SYNAPSIS_BODY_STATUS = "synapsis_body_status";
-
    private SynapsisWebSocket webSocket;
-
-   public String name;
+   private SynapsisBodyInfo bodyInfo;
 
    protected void init(final String name, final String url, final int reconnectionAttempts) {
-      this.name = name;
-      this.defineObsProperty(SYNAPSIS_BODY_STATUS, false);
+      this.bodyInfo = new SynapsisBodyInfo(name);
+      this.defineObsProperty(Shared.SYNAPSIS_COUNTERPART_STATUS_BELIEF, false);
 
       this.webSocket = new SynapsisWebSocket(url, reconnectionAttempts);
    }
-   
+
+   @OPERATION
+   private void createMockEntity(final String className, final String entityName) {
+      Message message = new Message(this.bodyInfo.entityName, Shared.SYNAPSIS_MIDDLEWARE, Shared.SYNAPSIS_MIDDLEWARE_CREATE_MOCK);
+      message.addParameter(className);
+      message.addParameter(entityName);
+      message.addParameter(Shared.ENTITY_BODY_KEY);
+      this.webSocket.sendMessage(message);
+   }
+
+   @OPERATION
+   private void createMockEntities(final String className, final String entityName, final int numberOfEntities) {
+      for (int i = 1; i <= numberOfEntities; i++) {
+         this.createMockEntity(className, entityName + i);
+      }
+   }
+
+   @OPERATION
+   private void deleteMockEntity(final String entityName) {
+      Message message = new Message(this.bodyInfo.entityName, Shared.SYNAPSIS_MIDDLEWARE, Shared.SYNAPSIS_MIDDLEWARE_DELETE_MOCK);
+      message.addParameter(entityName);
+      message.addParameter(Shared.ENTITY_BODY_KEY);
+      this.webSocket.sendMessage(message);
+   }
+
+   @OPERATION
+   private void deleteMockEntities(final String entityName, final int numberOfEntities) {
+      for (int i = 1; i <= numberOfEntities; i++) {
+         this.deleteMockEntity(entityName + i);
+      }
+   }
+
    protected void doAction(final String action, final ArrayList<Object> params) {
-      this.webSocket.sendMessage(new Message(this.name, this.name, action, params));
+      this.webSocket.sendMessage(new Message(this.bodyInfo.entityName, this.bodyInfo.entityName, action, params));
+   }
+   
+   @Override
+   protected void dispose() {
+      this.printLog("dispose");
+      //Elimino (anche se non presente) la mock entity (così per evitare di lasciarla attiva su synapsis)
+      this.deleteMockEntity(this.bodyInfo.entityName);
    }
 
    private void incomingMessage(final Message message) {
@@ -50,19 +87,19 @@ public abstract class SynapsisBody extends Artifact {
        * artifact.
        */
       this.beginExternalSession();
-      
+
       // Prelevo i parametri e li converto in array di Object cosi da renderli facilmente utilizzabili su JASON
       Object[] params = new Object[message.getParameters().size()];
       params = message.getParameters().toArray(params);
-      
-      //TODO parsing ricorsivo dei parametri?
-      
-      if (this.hasObsProperty(message.getContent())){
+
+      // TODO parsing ricorsivo dei parametri?
+
+      if (this.hasObsProperty(message.getContent())) {
          this.updateObsProperty(message.getContent(), params);
-      }else {
+      } else {
          this.defineObsProperty(message.getContent(), params);
       }
-      
+
       /*
        * Ends an external use session. Method to be called to close a session started
        * by a thread to finalize the state.
@@ -71,58 +108,47 @@ public abstract class SynapsisBody extends Artifact {
 
    }
 
-   private void changeBodyStatus(final boolean status) {
+   private void changeCounterpartStatus(final boolean status) {
       this.beginExternalSession();
-      this.updateObsProperty(SYNAPSIS_BODY_STATUS, status);
+      this.updateObsProperty(Shared.SYNAPSIS_COUNTERPART_STATUS_BELIEF, status);
       this.endExternalSession(true);
    }
 
    private void printLog(final String log) {
       this.beginExternalSession();
       String time = new SimpleDateFormat("HH:mm:ss").format(new Date()); // 12:08:43
-      System.out.println("[Synapsis - Body_" +this.name + " - "+ time +"]: " + log);
+      this.log("[Synapsis - Body_" + this.bodyInfo.entityName + " - " + time + "]: " + log);
       this.endExternalSession(true);
    }
 
    @ClientEndpoint
    public class SynapsisWebSocket extends ReconnectHandler {
-      
-      private static final String SYNAPSIS_MIDDLEWARE = "SynapsisMiddleware";
-      private static final String SYNAPSIS_MIDDLEWARE_READY = "SynapsisMiddlewareReady";
-      private static final String SYNAPSIS_MIDDLEWARE_UNREADY = "SynapsisMiddlewareUnready";
-      private static final String SYNAPSIS_ENDPOINT = "synapsiservice/";
-      private static final String ENTITY_PATH = "brain/";
-      
-      private ClientManager clientManager;
+
+      private ClientManager clientManager = ClientManager.createClient();
       private Session session;
-      private ConnectionStatus status;
-      private ConcurrentLinkedQueue<Message> messagesToSend;
+      private ConcurrentLinkedQueue<Message> messagesToSendToBody = new ConcurrentLinkedQueue<>();
+      private ConcurrentLinkedQueue<Message> messagesToSendToMiddleware = new ConcurrentLinkedQueue<>();
       private int reconnectionAttempts;
-      private int attempt;
 
       public SynapsisWebSocket(final String url, final int reconnectionAttempts) {
-         this.status = ConnectionStatus.SYNAPSIS_DISCONNECTED;
-         this.clientManager = ClientManager.createClient();
-         this.messagesToSend = new ConcurrentLinkedQueue<>();
          this.reconnectionAttempts = reconnectionAttempts;
-         this.attempt = 0;
-         
+
          try {
-            clientManager.getProperties().put(ClientProperties.RECONNECT_HANDLER,SynapsisWebSocket.this);
+            clientManager.getProperties().put(ClientProperties.RECONNECT_HANDLER, SynapsisWebSocket.this);
             // La connessione avviene in un thread separato rispetto a quello dell'artefatto
-            this.clientManager.asyncConnectToServer(SynapsisWebSocket.this, new URI(url + SYNAPSIS_ENDPOINT + ENTITY_PATH + name));
-            //this.clientManager.asyncConnectToServer(SynapsisWebSocket.this, new URI("ws://synapsis-middleware.herokuapp.com/"+ SYNAPSIS_ENDPOINT + ENTITY_PATH + agentName));
+            this.clientManager.asyncConnectToServer(SynapsisWebSocket.this, new URI(url + Shared.SYNAPSIS_ENDPOINT_PATH + Shared.ENTITY_MIND_KEY + "/" + bodyInfo.entityName));
+            // this.clientManager.asyncConnectToServer(SynapsisWebSocket.this, new URI("ws://synapsis-middleware.herokuapp.com/"+ Shared.SYNAPSIS_ENDPOINT_PATH + Shared.ENTITY_MIND_KEY + "/" + bodyInfo.entityName));
          } catch (DeploymentException | URISyntaxException e1) {
             e1.printStackTrace();
          }
-         changeBodyStatus(true);
       }
 
       @OnOpen
       public void onOpen(Session session) { // Tyrus utilizza un thread secondario
+         bodyInfo.currentReconnectionAttempt = 0;
+         bodyInfo.synapsisStatus = ConnectionStatus.CONNECTED;
          this.session = session;
-         this.attempt = 0;
-         this.status = ConnectionStatus.SYNAPSIS_CONNECTED;
+         this.rifleMessagesToSendToMiddleware();
       }
 
       @OnMessage
@@ -132,14 +158,16 @@ public abstract class SynapsisBody extends Artifact {
          message.addTimeStat(currentMills);
          printLog("onMessage: " + message.toString());
 
-         if (message.getSender().equals(SYNAPSIS_MIDDLEWARE)) {
+         if (message.getSender().equals(Shared.SYNAPSIS_MIDDLEWARE)) {
             switch (message.getContent()) {
-            case SYNAPSIS_MIDDLEWARE_READY:
-               this.status = ConnectionStatus.SYNAPSIS_BODY_CONNECTED;
-               this.rifleMessagesToSend();
+            case Shared.COUNTERPART_READY:
+               bodyInfo.bodyStatus = ConnectionStatus.CONNECTED;
+               this.rifleMessagesToSendToBody();
+               changeCounterpartStatus(true);
                break;
-            case SYNAPSIS_MIDDLEWARE_UNREADY:
-               this.status = ConnectionStatus.SYNAPSIS_BODY_DISCONNECTED;
+            case Shared.COUNTERPART_UNREADY:
+               changeCounterpartStatus(false);
+               bodyInfo.bodyStatus = ConnectionStatus.DISCONNECTED;
             }
          } else {
             incomingMessage(message);
@@ -148,35 +176,62 @@ public abstract class SynapsisBody extends Artifact {
 
       @OnClose
       public void onClose(CloseReason reason, Session session) { // Tyrus utilizza un thread secondario
-         this.status = ConnectionStatus.SYNAPSIS_DISCONNECTED;
+         changeCounterpartStatus(false);
+         bodyInfo.synapsisStatus = ConnectionStatus.DISCONNECTED;
+         bodyInfo.bodyStatus = ConnectionStatus.DISCONNECTED;
          printLog("onClose: Sessione: " + session.getId() + " - messaggio: " + reason.getReasonPhrase());
       }
 
       @OnError
       public void onError(Session session, Throwable error) { // Tyrus utilizza un thread secondario
-         this.status = ConnectionStatus.SYNAPSIS_DISCONNECTED;
+         changeCounterpartStatus(false);
+         bodyInfo.synapsisStatus = ConnectionStatus.DISCONNECTED;
+         bodyInfo.bodyStatus = ConnectionStatus.DISCONNECTED;
          printLog("OnError: Sessione:" + session.getId() + " - messaggio: " + error.getMessage());
          // error.printStackTrace();
       }
 
       public void sendMessage(final Message message) {
-         if (this.status.equals(ConnectionStatus.SYNAPSIS_BODY_CONNECTED)) {
-            try {
-               message.addTimeStat(System.currentTimeMillis());
-               this.session.getBasicRemote().sendText(message.toString());
-            } catch (IOException e) {
-               this.messagesToSend.add(message);
-               e.printStackTrace();
-
+         try { 
+            switch (message.getReceiver()) {
+            case Shared.SYNAPSIS_MIDDLEWARE:
+               if (ConnectionStatus.CONNECTED.equals(bodyInfo.synapsisStatus)) {
+                  message.addTimeStat(System.currentTimeMillis());
+                  this.session.getBasicRemote().sendText(message.toString());
+               } else {
+                  this.messagesToSendToMiddleware.add(message);
+               }
+               break;
+            default:
+               if (ConnectionStatus.CONNECTED.equals(bodyInfo.bodyStatus)) {
+                  message.addTimeStat(System.currentTimeMillis());
+                  this.session.getBasicRemote().sendText(message.toString());
+               } else {
+                  this.messagesToSendToBody.add(message);
+               }
+               break;
             }
-         } else {
-            this.messagesToSend.add(message);
+         } catch (IOException e) {
+            if (Shared.SYNAPSIS_MIDDLEWARE.equals(message.getReceiver())) {
+               this.messagesToSendToMiddleware.add(message);
+            } else {
+               this.messagesToSendToBody.add(message);
+            }
+            e.printStackTrace();
          }
       }
 
-      private void rifleMessagesToSend() {
-         printLog("Invio di tutti i messaggi in attesa...");
-         for (Iterator<Message> iterator = messagesToSend.iterator(); iterator.hasNext();) {
+      private void rifleMessagesToSendToBody() {
+         printLog("Invio al body tutti i messaggi in attesa...");
+         for (Iterator<Message> iterator = messagesToSendToBody.iterator(); iterator.hasNext();) {
+            this.sendMessage(iterator.next());
+            iterator.remove();
+         }
+      }
+
+      private void rifleMessagesToSendToMiddleware() {
+         printLog("Invio al middleware tutti i messaggi in attesa...");
+         for (Iterator<Message> iterator = messagesToSendToMiddleware.iterator(); iterator.hasNext();) {
             this.sendMessage(iterator.next());
             iterator.remove();
          }
@@ -185,9 +240,9 @@ public abstract class SynapsisBody extends Artifact {
       @Override
       // Invocato dopo il metodo onClose della WebSocket
       public boolean onDisconnect(CloseReason closeReason) {
-         this.attempt++;
-         if (this.reconnectionAttempts >= this.attempt) {
-            printLog("onDisconnect - messaggio: " + closeReason.getReasonPhrase() +" --> Tentativo riconnessione " + this.attempt);
+         bodyInfo.currentReconnectionAttempt++;
+         if (this.reconnectionAttempts >= bodyInfo.currentReconnectionAttempt) {
+            printLog("onDisconnect - messaggio: " + closeReason.getReasonPhrase() + " --> Tentativo riconnessione " + bodyInfo.currentReconnectionAttempt);
             return true;
          } else {
             return false;
@@ -195,16 +250,21 @@ public abstract class SynapsisBody extends Artifact {
       }
 
       @Override
-      //Invocato dopo Connect o AsyncConnect
+      // Invocato dopo Connect o AsyncConnect
       public boolean onConnectFailure(Exception exception) {
-         this.attempt++;
-         if (this.reconnectionAttempts >= this.attempt) {
-            printLog("onConnectFailure - messaggio: " + exception.toString() + " --> Tentativo riconnesione " + this.attempt);
+         bodyInfo.currentReconnectionAttempt++;
+         if (this.reconnectionAttempts >= bodyInfo.currentReconnectionAttempt) {
+            printLog("onConnectFailure - messaggio: " + exception.toString() + " --> Tentativo riconnesione " + bodyInfo.currentReconnectionAttempt);
             // exception.printStackTrace();
             return true;
-         } else {   
+         } else {
             return false;
          }
       }
+
+
+      /*
+       * Il delay tra una riconnessione e l'altra di default è 5 secondi
+       */
    }
 }

@@ -9,7 +9,6 @@ synapsis_agent_path("src/agt/simple_agent.asl").
 
 !spawnSynapsisAgent(1).
 
-
 { include("synapsisJaCaMo/spawner_synapsis_agents.asl") } 
 
 { include("$jacamoJar/templates/common-cartago.asl") }
