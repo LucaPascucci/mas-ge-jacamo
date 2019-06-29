@@ -6,13 +6,10 @@ synapsis_body_class("artifacts.SimpleAgentBody").
 
 /* Initial goals */
 
+!createSynapsisBody(["prova",1,false]).
+!createMySynapsisMockEntity("TestMock").
 
-!createSynapsisBody.
-!myMockEntity.
-
-/* Plans */
-
-//INIZIO ---- BELIEF DINAMICI
+//INIZIO -> BELIEF DINAMICI
 +synapsis_counterpart_status(C) <-
    if (C == true){
       !logMessage("Controparte collegata");
@@ -25,21 +22,16 @@ synapsis_body_class("artifacts.SimpleAgentBody").
    if (Y == false){
       .print("Arrivata la risposta automatica -> valori: ",X, " - ", Y ," - ", Z );
    }.
-   
-+here(X,Y,Z) <-
-   .print("Il mio corpo si trova qui: ", X, ", ", Y, ", ", Z).
  
-//FINE ---- BELIEF DINAMICI
+//FINE -> BELIEF DINAMICI
 
-+!myMockEntity <-
-   .my_name(Me);
-   !createMockEntity("TestMock",Me).
+/* Plans */
 
 +!personalSend <-
    azionePersonalizzata;
    .wait(3000);
    !!personalSend.
-   
-// inclusione dell'asl che contenente belief e plan di base per synapsis
-// è possibile collegare anche un file asl all'interno di un JAR
+
+
+// inclusione dell'asl che contenente belief e plan di base per synapsis è possibile collegare anche un file asl all'interno di un JAR
 { include("synapsisJaCaMo/synapsis_base_agent.asl") } 

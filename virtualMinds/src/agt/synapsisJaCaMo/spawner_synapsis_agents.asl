@@ -17,7 +17,7 @@
 /* Plans */
 
 +!spawnSynapsisAgent(N): N > 0  <-
-   !!createSynapsisAgent(N);
+   !createSynapsisAgent(N);
 	!spawnSynapsisAgent(N-1).
 
 +!spawnSynapsisAgent(N): N = 0 <-

@@ -1,25 +1,31 @@
 /* Beliefs per synapsis */
 synapsis_url("ws://localhost:9000/").
 reconnection_attempts(5).
-synapsis_body_class("artifacts.PlasticRobotBody").
+synapsis_body_class("robots.PlasticRobotBody").
 
-/* Goal iniziale per synapsis */
-!createSynapsisBody.
-!myMockEntity.
+/* Initial goals */
 
-/* Plans */
+!createSynapsisBody([]).
+!createMySynapsisMockEntity("PlasticRobotMock").
 
-//FOCUS SU ARTEFATTO GARBAGE
-   //1)avviare plan recycle
+/* Beliefs dinamici */
+
++synapsis_counterpart_status(C) <-
+   if (C == true){
+      !logMessage("Controparte collegata -> Inizio a Lavorare");
+      !!recycle;
+   } else {
+      !logMessage("Controparte non collegata");
+   }.
 
 +hand_garbage(Name) <-
-   //Attivo plan
    !!recycle. 
-
-//INIZIO ---- BELIEF DINAMICI
+   
 +found_garbage(Name) <- //trovata spazzatura --> Name (gameobject)
-   .print("Devo fare focus sull'artefatto --> ", Name).
-   //focus sull'artefatto 
+   //focus sull'artefatto
+   //vado verso di lei
+   focus(Name);
+   !!recycle. 
 
 +found_bin(Name) <-
    !!recycle.
@@ -27,16 +33,7 @@ synapsis_body_class("artifacts.PlasticRobotBody").
 +arrived_to(Name) <-
    !!recycle.
 
-//FINE ---- BELIEF DINAMICI
-
-+!myMockEntity <-
-   .my_name(Me);
-   !createMockEntity("PlasticRobotMock",Me).
-
-/* Plan per synapsis */
-+!startMind : true <-
-   .print("Inizio a lavorare");
-   !!recycle.
+/* Plans */
    
 +!recycle: hand_garbage(Garbage) & found_bin(Bin) & arrived_to(Bin) <- 
    .print("Sono arrivato al bidone con la spazzatura in mano --> devo riciclare").
@@ -52,24 +49,26 @@ synapsis_body_class("artifacts.PlasticRobotBody").
    //azion cerca bidone
 
 +!recycle: found_garbage(Garbage) & arrived_to(Garbage) <-
-   .print("Sono arrivato alla spazzatura ", Garbage, " ora la prendo.").
-   //Azione pickup
-   
-+!recycle: found_garbage(Name) <-
-   .print("Ho visto della spazzatura: ", Name);
-   .print("Controllo spazzatura trovata").
+   .print("Sono arrivato alla spazzatura ", Garbage, " ora la controllo.").
    //Controllo tipologia
       //giusta --> controllo se è libera
-         //libera --> la occupo(metodo artefatto garbage) + Azione goto
+         //libera --> la occupo(metodo artefatto garbage) + Azione pickup
          //non libera --> unfocus sull'artefatto spazzatura rimuovo belief found_garbage + riattivo plan "RICICLA"
       //non giusta --> unfocus + rimuovo belief found_garbage + riattivo plan "RICICLA"
+   
++!recycle: found_garbage(Garbage) <-
+   .print("Ho visto della spazzatura: ", Garbage);
+   goTo(Garbage).
+   
        
 -!recycle <-
-   .print("Sono libero... cerco della spazzatura");
+   !logMessage("Sono libero... cerco della spazzatura");
    searchGarbage. //azione per cercare spazzatura
+   
+
 
 // inclusione dell'asl che contenente belief e plan di base per synapsis. è possibile collegare anche un file asl all'interno di un JAR
-{ include("jar:file:/Users/luca/mas-ge-jacamo/recyclingRobots/lib/SynapsisJaCaMo.jar!/agt/synapsisJaCaMo/synapsis_base_agent.asl") } 
+{ include("synapsisJaCaMo/synapsis_base_agent.asl") } 
 
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }

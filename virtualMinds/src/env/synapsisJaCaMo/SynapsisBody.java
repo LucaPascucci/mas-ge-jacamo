@@ -33,12 +33,27 @@ public abstract class SynapsisBody extends Artifact {
 
    protected void init(final String name, final String url, final int reconnectionAttempts) {
       this.bodyInfo = new SynapsisBodyInfo(name);
+      
       this.defineObsProperty(Shared.SYNAPSIS_COUNTERPART_STATUS_BELIEF, false);
 
       this.webSocket = new SynapsisWebSocket(url, reconnectionAttempts);
    }
-
+   
+   protected void doAction(final String action, final ArrayList<Object> params) {
+      this.webSocket.sendMessage(new Message(this.bodyInfo.entityName, this.bodyInfo.entityName, action, params));
+   }
+   
    @OPERATION
+   protected void createMyMockEntity(final String className) {
+      this.createMockEntity(className, this.bodyInfo.entityName);
+   }
+   
+   @OPERATION
+   protected void deleteMyMockEntity() {
+      this.deleteMockEntity(this.bodyInfo.entityName);
+   }
+
+   // XXX deciso di dare la possibilità di creare solo la proprià mock entity
    private void createMockEntity(final String className, final String entityName) {
       Message message = new Message(this.bodyInfo.entityName, Shared.SYNAPSIS_MIDDLEWARE, Shared.SYNAPSIS_MIDDLEWARE_CREATE_MOCK);
       message.addParameter(className);
@@ -47,14 +62,16 @@ public abstract class SynapsisBody extends Artifact {
       this.webSocket.sendMessage(message);
    }
 
-   @OPERATION
+   // XXX deciso di dare la possibilità di creare solo la proprià mock entity
+   /*
    private void createMockEntities(final String className, final String entityName, final int numberOfEntities) {
       for (int i = 1; i <= numberOfEntities; i++) {
          this.createMockEntity(className, entityName + i);
       }
    }
-
-   @OPERATION
+   */
+   
+   // XXX deciso di dare la possibilità di eliminare solo la proprià mock entity
    private void deleteMockEntity(final String entityName) {
       Message message = new Message(this.bodyInfo.entityName, Shared.SYNAPSIS_MIDDLEWARE, Shared.SYNAPSIS_MIDDLEWARE_DELETE_MOCK);
       message.addParameter(entityName);
@@ -62,22 +79,22 @@ public abstract class SynapsisBody extends Artifact {
       this.webSocket.sendMessage(message);
    }
 
-   @OPERATION
+   // XXX deciso di dare la possibilità di creare solo la proprià mock entity
+   /*
    private void deleteMockEntities(final String entityName, final int numberOfEntities) {
       for (int i = 1; i <= numberOfEntities; i++) {
          this.deleteMockEntity(entityName + i);
       }
    }
+   */
 
-   protected void doAction(final String action, final ArrayList<Object> params) {
-      this.webSocket.sendMessage(new Message(this.bodyInfo.entityName, this.bodyInfo.entityName, action, params));
-   }
-   
+   //FIXME dovrebbe essere il metodo richiamato prima della distruzione di un artefatto??
    @Override
    protected void dispose() {
+      //Invio la richiesta di eliminare la propria mock entity (anche se non presente) per evitare di lasciarla attiva nel middleware
+      this.deleteMyMockEntity();
       this.printLog("dispose");
-      //Elimino (anche se non presente) la mock entity (così per evitare di lasciarla attiva su synapsis)
-      this.deleteMockEntity(this.bodyInfo.entityName);
+      
    }
 
    private void incomingMessage(final Message message) {
@@ -91,8 +108,6 @@ public abstract class SynapsisBody extends Artifact {
       // Prelevo i parametri e li converto in array di Object cosi da renderli facilmente utilizzabili su JASON
       Object[] params = new Object[message.getParameters().size()];
       params = message.getParameters().toArray(params);
-
-      // TODO parsing ricorsivo dei parametri?
 
       if (this.hasObsProperty(message.getContent())) {
          this.updateObsProperty(message.getContent(), params);
@@ -117,7 +132,7 @@ public abstract class SynapsisBody extends Artifact {
    private void printLog(final String log) {
       this.beginExternalSession();
       String time = new SimpleDateFormat("HH:mm:ss").format(new Date()); // 12:08:43
-      this.log("[Synapsis - Body_" + this.bodyInfo.entityName + " - " + time + "]: " + log);
+      this.log("[SynapsisBody - " + this.bodyInfo.entityName + " - " + time + "]: " + log);
       this.endExternalSession(true);
    }
 
@@ -156,7 +171,7 @@ public abstract class SynapsisBody extends Artifact {
          long currentMills = System.currentTimeMillis();
          Message message = Message.buildMessage(JSONmessage);
          message.addTimeStat(currentMills);
-         printLog("onMessage: " + message.toString());
+         // printLog("onMessage: " + message.toString());
 
          if (message.getSender().equals(Shared.SYNAPSIS_MIDDLEWARE)) {
             switch (message.getContent()) {

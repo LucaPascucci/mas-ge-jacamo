@@ -15,12 +15,25 @@
 /*
  * utilizzare console web (localhost:PORTA) 
  * per controllare lo stato di agenti e artefatti
- * 
  */ 
 
 mas virtualMinds { 
 
-   agent spawn_garbage : spawn_garbage.asl 
-   agent spawn_test : spawn_test.asl 
+   // agent spawn_garbage : spawn_garbage.asl 
+   // agent spawn_test : spawn_test.asl
+   
+   agent plastic_robot
+   agent paper_robot
+   agent glass_robot
+   
+   agent plastic_garbage_spawner
+   
+   /*agent test : simple_agent.asl {
+       instances: 2
+   }*/
+   
+   /*workspace w1 {
+      artifact garbage: artifacts.GarbageBody("garbage","ws://localhost:9000/",5)
+   }*/
    
 }

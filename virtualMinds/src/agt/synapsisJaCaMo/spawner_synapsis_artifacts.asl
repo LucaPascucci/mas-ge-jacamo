@@ -15,35 +15,36 @@ synapsis_base_name("synapsis_").
 
 /* Goal di esempio per avviare la creazione di artefatti
  * 
- * !spawnSynapsisArtifact(3). --> crea 3 SynapsisBody
+ * !spawnSynapsisArtifact(3). --> crea 3 artefatti SynapsisBody
  * 
  */
 
 /* Plans */
 
-+!spawnSynapsisArtifact(N): N > 0 <-
-   !!createSynapsisBody(N);
-   !spawnSynapsisArtifact(N-1).
++!spawnSynapsisArtifact(N,Params): N > 0 <-
+   !createSynapsisBody(N,Params);
+   !spawnSynapsisArtifact(N-1,Params).
 
-+!spawnSynapsisArtifact(N): N = 0 <-
++!spawnSynapsisArtifact(N,Params): N = 0 <-
    !logMessage("Conclusa creazione synapsis bodies").
 
 -!spawnSynapsisArtifact <-
    !logMessage("Errore durante la creazione di synapsis bodies").
    
-+!createSynapsisBody(N): 
++!createSynapsisBody(N,Params): 
    synapsis_url(Url) & 
    synapsis_body_class(Class) & 
-   synapsis_body_base_name(Default) & 
-   synapsis_artifact_base_name(Name) &
-   reconnection_attempts(Attempts) <-
-   .concat(Name,N,SynapsisBodyName);
-   .concat(Default,SynapsisBodyName,ArtifactName);
-   makeArtifact(ArtifactName,Class,[SynapsisBodyName,Url,Attempts],Id);
+   synapsis_body_base_name(BodyBaseName) & 
+   synapsis_base_name(BaseName) &
+   reconnection_attempts(Attempts) 
+   <-
+   .concat(BodyBaseName,N,SynapsisBodyName);
+   .concat(BaseName,SynapsisBodyName,ArtifactName);
+   makeArtifact(ArtifactName,Class,[SynapsisBodyName,Url,Attempts,Params],Id);
    .concat("Creato ", SynapsisBodyName, Message);
    !logMessage(Message).
 
--!createSynapsisBody <-
+-!createSynapsisBody(N,Params) <-
    !logMessage("Errore durante la creazione di un synapsis body").
    
 +!logMessage(Message) <- 

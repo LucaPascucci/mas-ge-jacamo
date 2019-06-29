@@ -1,9 +1,7 @@
 // CArtAgO artifact code for project recyclingRobots
 
-package artifacts;
+package robots;
 
-import cartago.OPERATION;
-//import cartago.*;
 import synapsisJaCaMo.SynapsisBody;
 
 public class GlassRobotBody extends SynapsisBody {
@@ -12,6 +10,4 @@ public class GlassRobotBody extends SynapsisBody {
       super.init(name, url, reconnectionAttempts);
    }
    
-   @OPERATION
-   void nulla() {}
 }

@@ -10,6 +10,7 @@ public class SynapsisBodyFactory extends Artifact {
    
    void init() {}
 
+   // FIXME Parametri molto vecchi, sicuramente da rivedere
    @OPERATION
    void createSynapsisBody(final String agentName, final String synapsisUrl, final String synapsisEndpointPath, final int reconnectionAttempts, final String synapsisBodyClass, OpFeedbackParam<ArtifactId> res) {
      ArtifactConfig config = new ArtifactConfig(agentName,synapsisUrl,synapsisEndpointPath,reconnectionAttempts);

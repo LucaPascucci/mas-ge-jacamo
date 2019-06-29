@@ -1,6 +1,7 @@
-package artifacts;
+package robots;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import cartago.*;
 import synapsisJaCaMo.SynapsisBody;
@@ -14,6 +15,11 @@ public class PlasticRobotBody extends SynapsisBody {
    @OPERATION
    void searchGarbage() {
       this.doAction("search_garbage", new ArrayList<>());
+   }
+   
+   @OPERATION
+   void goTo(String entityName) {
+      this.doAction("go_to", new ArrayList<>(Arrays.asList(entityName)));
    }
 }
 
