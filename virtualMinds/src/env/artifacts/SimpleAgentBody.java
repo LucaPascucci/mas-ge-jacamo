@@ -20,4 +20,13 @@ public class SimpleAgentBody extends SynapsisBody {
       this.counter++;
    }
 
+   @Override
+   public void counterpartEntityReady() {}
+
+   @Override
+   public void counterpartEntityUnready() {}
+
+   @Override
+   public void parsePerception(String content, ArrayList<Object> params) {}
+
 }

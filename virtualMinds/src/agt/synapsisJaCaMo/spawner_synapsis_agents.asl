@@ -1,5 +1,3 @@
-// Synapsis mind spawner --> Agente permette la creazione di agenti
-
 /* Belief di esempio
  * 
  * synapsis_agent_base_name("simple_agent").
@@ -15,6 +13,8 @@
  */
  
 /* Plans */
+
+// TODO spawner non utile dato che è già possibile fare la stessa operazione nel file di configurazione di JaCaMo .jcm
 
 +!spawnSynapsisAgent(N): N > 0  <-
    !createSynapsisAgent(N);

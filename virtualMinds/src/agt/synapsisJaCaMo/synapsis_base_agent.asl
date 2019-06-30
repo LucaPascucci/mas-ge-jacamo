@@ -8,17 +8,18 @@ synapsis_base_name("synapsis_").
  * synapsis_url("ws://localhost:9000").
  * synapsis_body_class("package.class").
  * reconnection_attempts(5).
- * 
  */
 
 /* Esempio di goal per avviare la creazione  
  * 
- * !createSynapsisBody.
+ * !createSynapsisBody. --> creazione dell'artefatto che estende SynapsisBody
+ * oppure
+ * !createSynapsisBody(["testo",1,false]). --> creazione dell'artefatto che estende SynapsisBody con parametri custom
  */
  
-//Va sovrascritto per ogni agente che vuole utilizzare i Synapsis Body
-+synapsis_counterpart_status(C) <-
-   !logMessage("Sovrascrivere belief --> +synapsis_counterpart_status(C)");
+//Va sovrascritto per ogni agente che vuole utilizzare il proprio SynapsisBody
++synapsis_counterpart_status(Name,C): .my_name(Me) & .substring(Me,Name) <-
+   !logMessage("Sovrascrivere belief --> +synapsis_counterpart_status(Name,C): .my_name(Me) & .substring(Me,Name)");
    if (C == true){
       !logMessage("Controparte collegata");
    } else {
@@ -27,17 +28,29 @@ synapsis_base_name("synapsis_").
 
 /* Plans */
 
-+!createSynapsisBody(CustomParams):
-   synapsis_base_name(BaseName) & 
-   synapsis_url(Url) & 
-   synapsis_body_class(Class) & 
-   reconnection_attempts(Attempts) <-
++!createSynapsisBody(Params): synapsis_url(Url) & synapsis_body_class(Class) & reconnection_attempts(Attempts) <-
+   ?synapsis_base_name(BaseName);
    .my_name(Me);
    .concat(BaseName,Me,ArtifactName);
-   makeArtifact(ArtifactName,Class,[Me,Url,Attempts,CustomParams],Id);
+   makeArtifact(ArtifactName,Class,[Me,Url,Attempts,Params],Id);
    focus(Id).
    
--!createSynapsisBody : synapsis_base_name(BaseName) <-
+-!createSynapsisBody(Params) <-
+   ?synapsis_base_name(BaseName);
+   .my_name(Me);
+   .concat(BaseName,Me,ArtifactName);
+   .concat("Creazione dell'artefatto ", ArtifactName, " fallita!!", Message);
+   !logMessage(Message).
+   
++!createSynapsisBody: synapsis_url(Url) & synapsis_body_class(Class) & reconnection_attempts(Attempts) <-
+   ?synapsis_base_name(BaseName);
+   .my_name(Me);
+   .concat(BaseName,Me,ArtifactName);
+   makeArtifact(ArtifactName,Class,[Me,Url,Attempts],Id);
+   focus(Id).
+   
+-!createSynapsisBody <-
+   ?synapsis_base_name(BaseName);
    .my_name(Me);
    .concat(BaseName,Me,ArtifactName);
    .concat("Creazione dell'artefatto ", ArtifactName, " fallita!!", Message);
@@ -61,57 +74,37 @@ synapsis_base_name("synapsis_").
 -!deleteMySynapsisMockEntity <-
    !!deleteMySynapsisMockEntity.
    
++!focusExternalSynapsisBody(EntityName) <-
+   ?synapsis_base_name(BaseName);
+   .concat(BaseName,EntityName,ArtifactName);
+   lookupArtifact(ArtifactName,Id);
+   focus(Id).
+    
+-!focusExternalSynapsisBody(EntityName) <-
+   .concat("Errore durante il focus del SynapsisBody -> ", EntityName, Message);
+   !logMessage(Message).
+
++!unfocusExternalSynapsisBody(EntityName) <-
+   ?synapsis_base_name(BaseName);
+   .concat(BaseName,EntityName,ArtifactName);
+   lookupArtifact(ArtifactName,Id);
+   unfocus(Id).
+    
+-!unfocusExternalSynapsisBody(EntityName) <-
+   .concat("Errore durante l'unfocus del SynapsisBody -> ", EntityName, Message);
+   !logMessage(Message).   
+
+   
 +!logMessage(Message) <- 
    .time(H,M,S);
    .my_name(Me);
    .print("[Synapsis - ", Me, " - ", H, ":", M, ":", S, "]: ", Message).
    
--!logMessage <-
+-!logMessage(Message) <-
    .time(H,M,S);
    .my_name(Me);
    .print("[Synapsis - ", Me, " - ", H, ":", M, ":", S, "]: Errore durante il log").
-  
-/*   
-+!createMockEntity(ClassName, EntityName): focused(_,N,_) & synapsis_base_name(BaseName) & .substring(BaseName,N) <- 
-   .concat("Inviata richiesta di creazione entità mock: ", EntityName, " -> classe: ", ClassName, Message);
-   !logMessage(Message);
-   .term2string(EntityName,EntityNameString);
-   createMockEntity(ClassName, EntityNameString).
-   
--!createMockEntity(ClassName, EntityName) <-
-   !!createMockEntity(ClassName, EntityName).
-*/
 
-/* 
-+!createMockEntities(ClassName, EntityName, NumberOfEntities): focused(_,N,_) & synapsis_base_name(BaseName) & .substring(BaseName,N) <- 
-   .concat("Inviata richiesta di creazione di ", NumberOfEntities , " entità mock: ", EntityName, " -> classe: ", ClassName, Message);
-   !logMessage(Message);
-   .term2string(EntityName,EntityNameString);
-   createMockEntities(ClassName, EntityNameString, NumberOfEntities).
 
--!createMockEntities(ClassName, EntityName, NumberOfEntities) <-
-   !!createMockEntities(ClassName, EntityName, NumberOfEntities).
-*/
-   
-/* 
-+!deleteMockEntity(EntityName): focused(_,N,_) & synapsis_base_name(BaseName) & .substring(BaseName,N) <- 
-   .concat("Inviata richiesta di eliminazione entità mock: ", EntityName, Message);
-   !logMessage(Message);
-   .term2string(EntityName,EntityNameString);
-   deleteMockEntity(EntityNameString).
-   
--!deleteMockEntity(EntityName) <-
-   !!deleteMockEntity(EntityName).
-*/
 
-/* 
-+!deleteMockEntities(EntityName, NumberOfEntities): focused(_,N,_) & synapsis_base_name(BaseName) & .substring(BaseName,N) <- 
-   .concat("Inviata richiesta di creazione di ", NumberOfEntities , " entità mock: ", EntityName, Message);
-   !logMessage(Message);
-   .term2string(EntityName,EntityNameString);
-   deleteMockEntities(EntityNameString).
-   
--!deleteMockEntities(EntityName,NumberOfEntities) <-
-   !!deleteMockEntity(EntityName,NumberOfEntities).   
-*/
    

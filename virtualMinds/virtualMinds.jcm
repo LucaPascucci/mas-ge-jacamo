@@ -18,22 +18,21 @@
  */ 
 
 mas virtualMinds { 
-
-   // agent spawn_garbage : spawn_garbage.asl 
-   // agent spawn_test : spawn_test.asl
    
-   agent plastic_robot
-   agent paper_robot
-   agent glass_robot
+   //agent plastic_robot: robots/plastic_robot.asl
+   // agent paper_robot: robots/paper_robot.asl
+   // agent glass_robot: robots/glass_robot.asl
    
-   agent plastic_garbage_spawner
+   agent plastic_garbage_spawner: garbages/plastic_garbage_spawner.asl
+   agent plastic_bin_spawner: bins/plastic_bin_spawner.asl
    
+   // STRUTTURA PER ISTANZIARE N agenti
    /*agent test : simple_agent.asl {
        instances: 2
    }*/
    
    /*workspace w1 {
-      artifact garbage: artifacts.GarbageBody("garbage","ws://localhost:9000/",5)
+      artifact garbage: garbages.GarbageBody("garbage","ws://localhost:9000/",5)
    }*/
    
 }

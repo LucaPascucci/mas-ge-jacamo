@@ -1,11 +1,11 @@
 /* Beliefs per synapsis */
 synapsis_url("ws://localhost:9000/").
 reconnection_attempts(5).
-synapsis_body_class("robots.PaperRobotBody").
+synapsis_body_class("robots.RobotBody").
 
 /* Initial goals */
 
-!createSynapsisBody([]).
+!createSynapsisBody(["paper"]).
 !createMySynapsisMockEntity("PaperRobotMock").
 
 /* Beliefs dinamici */
