@@ -50,7 +50,11 @@ public abstract class SynapsisBody extends Artifact {
 
    @OPERATION
    public void doAction(final String action, final Object... params) {
-      this.sendAction(action, new ArrayList<>(Arrays.asList(params)));
+      if (params.length > 0) {
+         this.sendAction(action, new ArrayList<>(Arrays.asList(params)));
+      } else {
+         this.sendAction(action, new ArrayList<>());
+      }
    }
 
    @OPERATION
@@ -95,24 +99,15 @@ public abstract class SynapsisBody extends Artifact {
       log = log.trim();
       this.synapsisBodyLog(log);
    }
-   
-   protected void sendAction(final String action, final ArrayList<Object> params) {
-      this.webSocket.sendMessage(new Message(this.bodyInfo.getEntityName(), this.bodyInfo.getEntityName(), action, params));
-   }
 
    //FIXME dovrebbe essere il metodo richiamato prima della distruzione dell'artefatto??
-   protected void stop() {
-      this.synapsisBodyLog("stop");
-      this.deleteMyMockEntity(); //Invio la richiesta di eliminare la propria mock entity (anche se non presente) per evitare di lasciarla attiva nel middleware
-   }
-
-   //FIXME dovrebbe essere il metodo richiamato prima della distruzione dell'artefatto??
+   @Override
    protected void dispose() {
       this.synapsisBodyLog("dispose");
       this.deleteMyMockEntity(); //Invio la richiesta di eliminare la propria mock entity (anche se non presente) per evitare di lasciarla attiva nel middleware
    }
    
-   protected void synapsisBodyLog(final String log) {
+   private void synapsisBodyLog(final String log) {
       this.beginExternalSession();
       String time = new SimpleDateFormat("HH:mm:ss").format(new Date()); // 12:08:43
       this.log(time + " - [Synapsis - " + this.bodyInfo.getEntityName() + "]: " + log);
@@ -123,7 +118,11 @@ public abstract class SynapsisBody extends Artifact {
 
    public abstract void counterpartEntityUnready();
 
-   public abstract void parseIncomingPerception(final String content, ArrayList<Object> params);
+   public abstract void parseIncomingPerception(final String perception, final ArrayList<Object> params);
+   
+   private void sendAction(final String action, final ArrayList<Object> params) {
+      this.webSocket.sendMessage(new Message(this.bodyInfo.getEntityName(), this.bodyInfo.getEntityName(), action, params));
+   }
 
    private void incomingMessage(final Message message) {
       // Begins an external use session of the artifact. Method to be called by external threads (not agents) before starting calling methods on the artifact.
@@ -183,7 +182,7 @@ public abstract class SynapsisBody extends Artifact {
       }
 
       @OnOpen
-      public void onOpen(Session session) { // Tyrus utilizza un thread secondario
+      public void onOpen(final Session session) { // Tyrus utilizza un thread secondario
          bodyInfo.setCurrentReconnectionAttempt(0);
          bodyInfo.setSynapsisStatus(ConnectionStatus.CONNECTED);
          this.session = session;
@@ -191,9 +190,9 @@ public abstract class SynapsisBody extends Artifact {
       }
 
       @OnMessage
-      public void onMessage(String JSONmessage, Session session) { // Tyrus utilizza un thread secondario
+      public void onMessage(final String msg, final Session session) { // Tyrus utilizza un thread secondario
          long currentMills = System.currentTimeMillis();
-         Message message = Message.buildMessage(JSONmessage);
+         Message message = Message.buildMessage(msg);
          message.addTimeStat(currentMills);
          bodyInfo.addNewMessage(message); //Aggiorno le statistiche di ricezione
 
@@ -214,7 +213,7 @@ public abstract class SynapsisBody extends Artifact {
       }
 
       @OnClose
-      public void onClose(CloseReason reason, Session session) { // Tyrus utilizza un thread secondario
+      public void onClose(final CloseReason reason, final Session session) { // Tyrus utilizza un thread secondario
          changeCounterpartStatus(false);
          bodyInfo.setSynapsisStatus(ConnectionStatus.DISCONNECTED);
          bodyInfo.setBodyStatus(ConnectionStatus.DISCONNECTED);
@@ -222,7 +221,7 @@ public abstract class SynapsisBody extends Artifact {
       }
 
       @OnError
-      public void onError(Session session, Throwable error) { // Tyrus utilizza un thread secondario
+      public void onError(final Session session, final Throwable error) { // Tyrus utilizza un thread secondario
          changeCounterpartStatus(false);
          bodyInfo.setSynapsisStatus(ConnectionStatus.DISCONNECTED);
          bodyInfo.setBodyStatus(ConnectionStatus.DISCONNECTED);
@@ -263,7 +262,7 @@ public abstract class SynapsisBody extends Artifact {
 
       private void rifleMessagesToSendToBody() {
          // printLog("Invio al body tutti i messaggi in attesa...");
-         for (Iterator<Message> iterator = messagesToSendToBody.iterator(); iterator.hasNext();) {
+         for (Iterator<Message> iterator = this.messagesToSendToBody.iterator(); iterator.hasNext();) {
             this.sendMessage(iterator.next());
             iterator.remove();
          }
@@ -271,7 +270,7 @@ public abstract class SynapsisBody extends Artifact {
 
       private void rifleMessagesToSendToMiddleware() {
          // printLog("Invio al middleware tutti i messaggi in attesa...");
-         for (Iterator<Message> iterator = messagesToSendToMiddleware.iterator(); iterator.hasNext();) {
+         for (Iterator<Message> iterator = this.messagesToSendToMiddleware.iterator(); iterator.hasNext();) {
             this.sendMessage(iterator.next());
             iterator.remove();
          }
@@ -281,7 +280,7 @@ public abstract class SynapsisBody extends Artifact {
 
       @Override
       // Invocato dopo il metodo onClose della WebSocket
-      public boolean onDisconnect(CloseReason closeReason) {
+      public boolean onDisconnect(final CloseReason closeReason) {
          bodyInfo.setCurrentReconnectionAttempt(bodyInfo.getCurrentReconnectionAttempt() + 1);
          if (this.reconnectionAttempts >= bodyInfo.getCurrentReconnectionAttempt()) {
             synapsisBodyLog("onDisconnect - messaggio: " + closeReason.getReasonPhrase() + " --> Tentativo riconnessione " + bodyInfo.getCurrentReconnectionAttempt());
@@ -293,7 +292,7 @@ public abstract class SynapsisBody extends Artifact {
 
       @Override
       // Invocato dopo Connect o AsyncConnect
-      public boolean onConnectFailure(Exception exception) {
+      public boolean onConnectFailure(final Exception exception) {
          bodyInfo.setCurrentReconnectionAttempt(bodyInfo.getCurrentReconnectionAttempt() + 1);
          if (this.reconnectionAttempts >= bodyInfo.getCurrentReconnectionAttempt()) {
             synapsisBodyLog("onConnectFailure - messaggio: " + exception.toString() + " --> Tentativo riconnesione " + bodyInfo.getCurrentReconnectionAttempt());

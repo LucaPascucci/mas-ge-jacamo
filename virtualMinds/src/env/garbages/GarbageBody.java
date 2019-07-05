@@ -3,7 +3,6 @@
 package garbages;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import cartago.OPERATION;
 import synapsisJaCaMo.SynapsisBody;
@@ -25,14 +24,14 @@ public class GarbageBody extends SynapsisBody {
    
    @OPERATION
    void recycleMe() {
-      this.synapsisBodyLog("Mi vogliono riciclare!!");
+      this.synapsisLog("Mi vogliono riciclare!!");
    }
 
    @Override
    public void counterpartEntityReady() {
       if (this.hasObsProperty(GARBAGE_TYPE)) {
          String type = this.getObsProperty(GARBAGE_TYPE).stringValue();
-         this.sendAction(GARBAGE_TYPE, new ArrayList<>(Arrays.asList(type)));
+         this.doAction(GARBAGE_TYPE, type);
       }
    }
 

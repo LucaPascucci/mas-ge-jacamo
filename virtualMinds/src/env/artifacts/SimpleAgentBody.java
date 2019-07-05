@@ -16,7 +16,7 @@ public class SimpleAgentBody extends SynapsisBody {
 
    @OPERATION
    void azionePersonalizzata() {
-      this.sendAction("Azione", new ArrayList<>(counter));
+      this.doAction("Azione", this.counter);
       this.counter++;
    }
 

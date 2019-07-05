@@ -1,7 +1,6 @@
 package robots;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import cartago.OPERATION;
 import synapsisJaCaMo.SynapsisBody;
@@ -22,29 +21,29 @@ public class RobotBody extends SynapsisBody {
    
    @OPERATION
    void searchGarbage() {
-      this.sendAction(SEARCH_GARBAGE, new ArrayList<>());
+      this.doAction(SEARCH_GARBAGE);
    }
    
    @OPERATION
    void searchBin() {
-      this.sendAction(SEARCH_BIN, new ArrayList<>());
+      this.doAction(SEARCH_BIN);
    }
    
    @OPERATION
    void pickUpGarbage(String entityName) {
-      this.sendAction(PICK_UP_GARBAGE, new ArrayList<>(Arrays.asList(entityName)));
+      this.doAction(PICK_UP_GARBAGE,entityName);
    }
    
    @OPERATION
    void recycleGarbage(String entityName) {
-      this.sendAction(RECYCLE_GARBAGE, new ArrayList<>(Arrays.asList(entityName)));
+      this.doAction(RECYCLE_GARBAGE, entityName);
    }
    
    @Override
    public void counterpartEntityReady() {
       if (this.hasObsProperty(ROBOT_TYPE)) {
          String type = this.getObsProperty(ROBOT_TYPE).stringValue();
-         this.sendAction(ROBOT_TYPE, new ArrayList<>(Arrays.asList(type)));
+         this.doAction(ROBOT_TYPE, type);
       }
    }
 

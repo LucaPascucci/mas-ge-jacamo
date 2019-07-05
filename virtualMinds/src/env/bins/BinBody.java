@@ -3,7 +3,6 @@
 package bins;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import synapsisJaCaMo.SynapsisBody;
 
@@ -24,7 +23,7 @@ public class BinBody extends SynapsisBody {
    public void counterpartEntityReady() {
       if (this.hasObsProperty(BIN_TYPE)) {
          String type = this.getObsProperty(BIN_TYPE).stringValue();
-         this.sendAction(BIN_TYPE, new ArrayList<>(Arrays.asList(type)));
+         this.doAction(BIN_TYPE, type);
       }
    }
 
