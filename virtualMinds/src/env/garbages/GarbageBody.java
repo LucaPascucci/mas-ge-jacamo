@@ -5,6 +5,7 @@ package garbages;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import cartago.OPERATION;
 import synapsisJaCaMo.SynapsisBody;
 
 public class GarbageBody extends SynapsisBody {
@@ -14,19 +15,24 @@ public class GarbageBody extends SynapsisBody {
    
    private static final String MOCK_CLASS = "GarbageMock";
 
-   protected void init(final String name, final String url, final int reconnectionAttempts, final Object[] params) {
+   protected void init(final String name, final String url, final int reconnectionAttempts, final Object... params) {
       this.defineObsProperty(GARBAGE_STATUS, false, "");
       this.defineObsProperty(GARBAGE_TYPE, params[0]); // prendo la tipologia di spazzatura dai parametri custom
      
       super.init(name, url, reconnectionAttempts);
       this.createMyMockEntity(MOCK_CLASS);
    }
+   
+   @OPERATION
+   void recycleMe() {
+      this.synapsisBodyLog("Mi vogliono riciclare!!");
+   }
 
    @Override
    public void counterpartEntityReady() {
       if (this.hasObsProperty(GARBAGE_TYPE)) {
          String type = this.getObsProperty(GARBAGE_TYPE).stringValue();
-         this.doAction(GARBAGE_TYPE, new ArrayList<>(Arrays.asList(type)));
+         this.sendAction(GARBAGE_TYPE, new ArrayList<>(Arrays.asList(type)));
       }
    }
 
@@ -34,6 +40,6 @@ public class GarbageBody extends SynapsisBody {
    public void counterpartEntityUnready() {}
 
    @Override
-   public void parsePerception(String content, ArrayList<Object> params) {}
+   public void parseIncomingPerception(String content, ArrayList<Object> params) {}
    
 }

@@ -19,12 +19,17 @@
 
 mas virtualMinds { 
    
-   //agent plastic_robot: robots/plastic_robot.asl
-   // agent paper_robot: robots/paper_robot.asl
-   // agent glass_robot: robots/glass_robot.asl
+   agent plastic_robot: robots/plastic_robot.asl
+   //agent paper_robot: robots/paper_robot.asl
+   //agent glass_robot: robots/glass_robot.asl
    
    agent plastic_garbage_spawner: garbages/plastic_garbage_spawner.asl
+   //agent paper_garbage_spawner: garbages/paper_garbage_spawner.asl
+   //agent glass_garbage_spawner: garbages/glass_garbage_spawner.asl
+   
    agent plastic_bin_spawner: bins/plastic_bin_spawner.asl
+   //agent paper_bin_spawner: bins/paper_bin_spawner.asl
+   //agent glass_bin_spawner: bins/glass_bin_spawner.asl
    
    // STRUTTURA PER ISTANZIARE N agenti
    /*agent test : simple_agent.asl {

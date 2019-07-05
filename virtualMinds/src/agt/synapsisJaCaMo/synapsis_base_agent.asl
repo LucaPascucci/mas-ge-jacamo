@@ -19,11 +19,12 @@ synapsis_base_name("synapsis_").
  
 //Va sovrascritto per ogni agente che vuole utilizzare il proprio SynapsisBody
 +synapsis_counterpart_status(Name,C): .my_name(Me) & .substring(Me,Name) <-
-   !logMessage("Sovrascrivere belief --> +synapsis_counterpart_status(Name,C): .my_name(Me) & .substring(Me,Name)");
+   ?my_synapsis_body_ID(ArtId);
+   synapsisLog("Sovrascrivere belief --> +synapsis_counterpart_status(Name,C): .my_name(Me) & .substring(Me,Name)") [artifact_id(ArtId)];
    if (C == true){
-      !logMessage("Controparte collegata");
+      synapsisLog("Controparte collegata") [artifact_id(ArtId)];
    } else {
-      !logMessage("Controparte non collegata");
+      synapsisLog("Controparte non collegata") [artifact_id(ArtId)];
    }.
 
 /* Plans */
@@ -32,44 +33,44 @@ synapsis_base_name("synapsis_").
    ?synapsis_base_name(BaseName);
    .my_name(Me);
    .concat(BaseName,Me,ArtifactName);
-   makeArtifact(ArtifactName,Class,[Me,Url,Attempts,Params],Id);
-   focus(Id).
+   makeArtifact(ArtifactName,Class,[Me,Url,Attempts,Params],ArtId);
+   +my_synapsis_body_ID(ArtId);
+   focus(ArtId).
    
 -!createSynapsisBody(Params) <-
    ?synapsis_base_name(BaseName);
    .my_name(Me);
    .concat(BaseName,Me,ArtifactName);
-   .concat("Creazione dell'artefatto ", ArtifactName, " fallita!!", Message);
-   !logMessage(Message).
+   .print("Creazione dell'artefatto ", ArtifactName, " fallita!!", Message).
    
 +!createSynapsisBody: synapsis_url(Url) & synapsis_body_class(Class) & reconnection_attempts(Attempts) <-
    ?synapsis_base_name(BaseName);
    .my_name(Me);
    .concat(BaseName,Me,ArtifactName);
-   makeArtifact(ArtifactName,Class,[Me,Url,Attempts],Id);
-   focus(Id).
+   makeArtifact(ArtifactName,Class,[Me,Url,Attempts],ArtId);
+   +my_synapsis_body_ID(ArtId);
+   focus(ArtId).
    
 -!createSynapsisBody <-
    ?synapsis_base_name(BaseName);
    .my_name(Me);
    .concat(BaseName,Me,ArtifactName);
-   .concat("Creazione dell'artefatto ", ArtifactName, " fallita!!", Message);
-   !logMessage(Message).
+   .print("Creazione dell'artefatto ", ArtifactName, " fallita!!", Message).
    
 +!createMySynapsisMockEntity(MockClassName): focused(_,N,_) & synapsis_base_name(BaseName) & .substring(BaseName,N) <-
+   ?my_synapsis_body_ID(ArtId);
    .my_name(Me);
-   createMyMockEntity(MockClassName);
-   .concat("Inviata richiesta di creazione entità mock: ", Me , " -> classe: ", MockClassName, Message);
-   !logMessage(Message).
+   createMyMockEntity(MockClassName) [artifact_id(ArtId)];
+   synapsisLog("Inviata richiesta di creazione entità mock:", Me , "-> classe:", MockClassName) [artifact_id(ArtId)].
    
 -!createMySynapsisMockEntity(MockClassName) <-
    !!createMySynapsisMockEntity(MockClassName).
 
 +!deleteMySynapsisMockEntity: focused(_,N,_) & synapsis_base_name(BaseName) & .substring(BaseName,N) <-
-   deleteMyMockEntity;
+   ?my_synapsis_body_ID(ArtId);
+   deleteMyMockEntity [artifact_id(ArtId)];
    .my_name(Me);
-   .concat("Inviata richiesta di eliminazione entità mock: ", Me, Message);
-   !logMessage(Message).
+   synapsisLog("Inviata richiesta di eliminazione entità mock ->", Me) [artifact_id(ArtId)].
 
 -!deleteMySynapsisMockEntity <-
    !!deleteMySynapsisMockEntity.
@@ -81,30 +82,15 @@ synapsis_base_name("synapsis_").
    focus(Id).
     
 -!focusExternalSynapsisBody(EntityName) <-
-   .concat("Errore durante il focus del SynapsisBody -> ", EntityName, Message);
-   !logMessage(Message).
+   ?my_synapsis_body_ID(ArtId);
+   synapsisLog("Errore durante il focus del SynapsisBody -> ", EntityName) [artifact_id(ArtId)].
 
-+!unfocusExternalSynapsisBody(EntityName) <-
++!stopFocusExternalSynapsisBody(EntityName) <-
    ?synapsis_base_name(BaseName);
    .concat(BaseName,EntityName,ArtifactName);
    lookupArtifact(ArtifactName,Id);
-   unfocus(Id).
+   stopFocus(Id). //XXX lo stopFocus non rimuove correttamente il belief --> focused(_,ArtifactName,_)
     
--!unfocusExternalSynapsisBody(EntityName) <-
-   .concat("Errore durante l'unfocus del SynapsisBody -> ", EntityName, Message);
-   !logMessage(Message).   
-
-   
-+!logMessage(Message) <- 
-   .time(H,M,S);
-   .my_name(Me);
-   .print("[Synapsis - ", Me, " - ", H, ":", M, ":", S, "]: ", Message).
-   
--!logMessage(Message) <-
-   .time(H,M,S);
-   .my_name(Me);
-   .print("[Synapsis - ", Me, " - ", H, ":", M, ":", S, "]: Errore durante il log").
-
-
-
-   
+-!stopFocusExternalSynapsisBody(EntityName) <-
+   ?my_synapsis_body_ID(ArtId);
+   synapsisLog("Errore durante lo stop focus del SynapsisBody ->", EntityName) [artifact_id(ArtId)].

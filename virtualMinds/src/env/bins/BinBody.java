@@ -24,7 +24,7 @@ public class BinBody extends SynapsisBody {
    public void counterpartEntityReady() {
       if (this.hasObsProperty(BIN_TYPE)) {
          String type = this.getObsProperty(BIN_TYPE).stringValue();
-         this.doAction(BIN_TYPE, new ArrayList<>(Arrays.asList(type)));
+         this.sendAction(BIN_TYPE, new ArrayList<>(Arrays.asList(type)));
       }
    }
 
@@ -32,6 +32,6 @@ public class BinBody extends SynapsisBody {
    public void counterpartEntityUnready() {}
 
    @Override
-   public void parsePerception(String content, ArrayList<Object> params) {}
+   public void parseIncomingPerception(String content, ArrayList<Object> params) {}
    
 }

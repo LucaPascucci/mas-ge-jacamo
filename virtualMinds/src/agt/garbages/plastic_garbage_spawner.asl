@@ -7,7 +7,7 @@ reconnection_attempts(5).
 
 /* Initial goals */
 
-!spawnSynapsisArtifact(2,["plastic"]).
+!spawnSynapsisArtifact(1,["plastic"]).
 
 // inclusione dell'asl che contenente belief e plan di base per synapsis. è possibile collegare anche un file asl all'interno di un JAR
 { include("synapsisJaCaMo/spawner_synapsis_artifacts.asl") } 

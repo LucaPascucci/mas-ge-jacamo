@@ -1,13 +1,13 @@
 /* Initial beliefs and rules */
 
 synapsis_url("ws://localhost:9000/").
-synapsis_body_base_name("plastic_bin").
+synapsis_body_base_name("paper_bin").
 synapsis_body_class("bins.BinBody").
 reconnection_attempts(5).
 
 /* Initial goals */
 
-!spawnSynapsisArtifact(1,["plastic"]).
+!spawnSynapsisArtifact(1,["paper"]).
 
 /* Plans */
 

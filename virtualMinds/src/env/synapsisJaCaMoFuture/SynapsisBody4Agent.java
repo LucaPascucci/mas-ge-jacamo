@@ -18,5 +18,5 @@ public class SynapsisBody4Agent extends SynapsisBody {
    public void counterpartEntityUnready() {}
 
    @Override
-   public void parsePerception(String content, ArrayList<Object> params) {}
+   public void parseIncomingPerception(String content, ArrayList<Object> params) {}
 }

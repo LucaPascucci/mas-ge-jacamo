@@ -72,9 +72,9 @@ synapsis_base_name("synapsis_").
 +!logMessage(Message) <- 
    .time(H,M,S);
    .my_name(Me);
-   .print("[Synapsis - ", Me, " - ", H, ":", M, ":", S, "]: ", Message).
+   .print(H, ":", M, ":", S," - [Synapsis - ", Me, "]: ", Message).
    
 -!logMessage <-
    .time(H,M,S);
    .my_name(Me);
-   .print("[Synapsis - ", Me, " - ", H, ":", M, ":", S, "]: Errore durante il log").
+   .print(H, ":", M, ":", S," - [Synapsis - ", Me, "]: Errore durante il log").

@@ -198,6 +198,13 @@ class Message {
    public void addTimeStat(final long time) {
       this.timeStats.add(time);
    }
+   
+   /**
+    * Pulisce tutte le statistiche temporali del messaggio
+    */
+   public void clearTimeStats() {
+      this.timeStats.clear();
+   }
 
    /**
     * Converte il messaggio in stringa (formato JSON)
@@ -220,19 +227,19 @@ class Message {
 
    // Contenuto array --> [timestamp invio entità, timestamp ricezione su Synapsis, timestamp invio da Synapsis, timestamp ricezione entità]
 
-   private long getTimeFromSenderToSynapsis() {
+   protected long getTimeFromSenderToSynapsis() {
       return (this.timeStats.get(1) - this.timeStats.getFirst());
    }
 
-   private long getSynapsisComputation() {
+   protected long getSynapsisComputation() {
       return (this.timeStats.get(2) - this.timeStats.get(1));
    }
 
-   private long getTimeFromSynapsisToReceiver() {
+   protected long getTimeFromSynapsisToReceiver() {
       return (this.timeStats.getLast() - this.timeStats.get(2));
    }
 
-   private long getTotalTime() {
+   protected long getTotalTime() {
       return (this.timeStats.getLast() - this.timeStats.getFirst());
    }
 

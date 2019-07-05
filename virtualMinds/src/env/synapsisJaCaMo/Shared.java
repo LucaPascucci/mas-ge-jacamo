@@ -14,6 +14,9 @@ public class Shared {
 
    public final static String SYNAPSIS_MIDDLEWARE_CREATE_MOCK = "CreateMock";
    public final static String SYNAPSIS_MIDDLEWARE_DELETE_MOCK = "DeleteMock";
+   
+   public static final String GO_TO_ACTION = "go_to";
+   public static final String STOP_ACTION = "stop";
 
    public final static String SYNAPSIS_COUNTERPART_STATUS_BELIEF = "synapsis_counterpart_status";
 
