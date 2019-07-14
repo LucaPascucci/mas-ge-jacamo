@@ -13,102 +13,89 @@ synapsis_body_class("robots.RobotBody").
 +synapsis_counterpart_status(Name, C): .my_name(Me) & .substring(Me,Name) <-
    ?my_synapsis_body_ID(ArtId);
    if (C == true){
-      synapsisLog("Controparte collegata -> Mettiamoci al lavoro!!!") [artifact_id(ArtId)];
+      synapsisLog("Controparte collegata -> Mettiamoci al lavoro!!!")[artifact_id(ArtId)];
       !!recycle;
    } else {
-      synapsisLog("Controparte non collegata") [artifact_id(ArtId)];
+      synapsisLog("Controparte non collegata")[artifact_id(ArtId)];
    }.
 
-//TODO effettuare prova di concorrenza sulla spazzatura
+//TODO prelevare ArtId di questo belief e se necessario effettuare "stopfocus..."
+/*
 +garbage_status(C, Name) <-
    ?my_synapsis_body_ID(ArtId);
    if (C == true){
-      synapsisLog("Attenzione spazzatura prelevata da", Name) [artifact_id(ArtId)];
+      synapsisLog("Attenzione! Spazzatura prelevata da -> ", Name) [artifact_id(ArtId)];
       .my_name(Me);
-      if (not .substring(Me,Name)){
+      if (not .substring(Me,Name)){ //TODO questo controllo non va bene 
          .drop_all_intentions; //TODO controllare se è necessario
          stopAction [artifact_id(ArtId)]; //fermo il body
-         ?found_garbage(Garbage);
-         !stopFocusExternalSynapsisBody(Garbage);
          removeRuntimeObsProperty("found_garbage") [artifact_id(ArtId)];
          !!recycle;
       };
    }.
-
-+hand_garbage(Name) <-
-   !!recycle. 
+*/
    
-+found_garbage(Name) <-
-   ?my_synapsis_body_ID(ArtId);
-   synapsisLog("Ho visto della spazzatura ->", Name) [artifact_id(ArtId)];
-   !focusExternalSynapsisBody(Name);
+   
++found(Name) <-
+   ?my_synapsis_body_ID(MyArtID);
+   synapsisLog("Ho visto questa entità -> ", Name)[artifact_id(MyArtID)];
    !!recycle.
 
-+found_bin(Name) <-
-   ?my_synapsis_body_ID(ArtId);
-   synapsisLog("Ho visto un bidone della spazzatura ->", Name) [artifact_id(ArtId)];
-   !focusExternalSynapsisBody(Name);
-   !!recycle.
-   
 +arrived_to(Name) <-
-   ?my_synapsis_body_ID(ArtId);
-   synapsisLog("Arrivato a destinazione ->", Name) [artifact_id(ArtId)];
+   ?my_synapsis_body_ID(MyArtID);
+   synapsisLog("Sono arrivato a questa entità -> ", Name)[artifact_id(MyArtID)];
    !!recycle.
+   
++picked(Name) <-
+   ?my_synapsis_body_ID(MyArtID);
+   synapsisLog("Ho raccolto questa entità -> ", Name)[artifact_id(MyArtID)];
+   !!recycle.
+
++released(Name) <-
+   ?my_synapsis_body_ID(MyArtID);
+   synapsisLog("Ho rilasciato questa entità -> ", Name)[artifact_id(MyArtID)];
+   removeAllRuntimeObsProperties[artifact_id(ArtId)].
 
 /* Plans */
+
++!recycle: picked(Garbage) & found(Bin) & arrived_to(Bin) & robot_type(Type) & bin_type(Type) <- //Controllo tipologia bidone
+   ?my_synapsis_body_ID(MyArtID);
+   synapsisLog("Stessa tipologia di bidone -> ", Bin)[artifact_id(MyArtID)]; //FIXME sull'artefatto bin?? non ha senso
+   releaseAction(Garbage)[artifact_id(MyArtID)]; //FIXME sull'artefatto bin?? non ha senso
+   synapsisLog("Riciclo la spazzatura -> ", Garbage)[artifact_id(MyArtID)]; //FIXME sull'artefatto bin?? non ha senso
+   recycleMe; // operazione dell'artefatto Garbage
+   !stopFocusExternalSynapsisBody(Bin);
+   !stopFocusExternalSynapsisBody(Garbage).
    
-+!recycle: hand_garbage(Garbage) & found_bin(Bin) & arrived_to(Bin) <- 
-   ?my_synapsis_body_ID(ArtId);
-   synapsisLog("Sono arrivato al bidone con la spazzatura in mano --> devo riciclare") [artifact_id(ArtId)];
-   recycleMe;
-   !stopFocusExternalSynapsisBody(Garbage);
-   removeRuntimeObsProperty("hand_garbage") [artifact_id(ArtId)];
-   removeRuntimeObsProperty("found_garbage") [artifact_id(ArtId)];
-   removeRuntimeObsProperty("arrived_to") [artifact_id(ArtId)];
++!recycle: found(Name) & arrived_to(Name) & picked(Name) <-
+   ?my_synapsis_body_ID(MyArtID);
+   synapsisLog("Cerco il bidone")[artifact_id(MyArtID)];
+   searchAction("bin") [artifact_id(MyArtID)].
+   
++!recycle: found(Name) & arrived_to(Name) & robot_type(Type) & garbage_type(Type) <- //Controllo tipologia spazzatura
+   ?my_synapsis_body_ID(MyArtID);
+   synapsisLog("Stessa tipologia di spazzatura -> ", Name)[artifact_id(MyArtID)]; //FIXME sull'artefatto bin?? non ha senso
+   pickUpAction(Name)[artifact_id(MyArtID)]. // azione per prendere spazzatura
+   
++!recycle: found(Name) <-
+   ?my_synapsis_body_ID(MyArtID);
+   synapsisLog("Vado verso l'entità vista -> ",Name)[artifact_id(MyArtID)];
+   !focusExternalSynapsisBody(Name);
+   goToAction(Name)[artifact_id(MyArtID)]. // azione per andare verso l'entità (in questo caso è la spazzatura)
+   
+-!recycle: found(Name) & arrived_to(Name) <-
+   ?my_synapsis_body_ID(MyArtID);
+   synapsisLog("L'entità non è della mia stessa tipologia' -> ",Name)[artifact_id(MyArtID)];
+   !stopFocusExternalSynapsisBody(Name);
+   removeRuntimeObsProperty("found")[artifact_id(MyArtID)];
+   removeRuntimeObsProperty("arrived_to")[artifact_id(MyArtID)];
    !!recycle.
-
-+!recycle: hand_garbage(Garbage) & found_bin(Bin) <-
-   ?my_synapsis_body_ID(ArtId);
-   synapsisLog("Ho in mano la spazzatura", Garbage, "ed ho visto il bidone", Bin) [artifact_id(ArtId)];
-   ?bin_type(BinType);
-   ?robot_type(RobotType);
-   if (RobotType == BinType) { //Controllo tipologia bidone
-      goTo(Bin) [artifact_id(ArtId)]; //giusta --> Azione goto
-   } else { //Bidone trovato non corrisponde per la tipologia di spazzatura --> rimuovo belief found_bin + riattivo plan "RICICLA"
-      !stopFocusExternalSynapsisBody(Bin);
-      removeRuntimeObsProperty("found_bin") [artifact_id(ArtId)];
-      !!recycle;
-   }.
-
-+!recycle: hand_garbage(Garbage) <-
-   ?my_synapsis_body_ID(ArtId);
-   synapsisLog("Ho preso la spazzatua ->", Garbage) [artifact_id(ArtId)];
-   searchBin.
-
-+!recycle: found_garbage(Garbage) & arrived_to(Garbage) <-
-   ?my_synapsis_body_ID(ArtId);
-   synapsisLog("Controllo la spazzatura ->", Garbage) [artifact_id(ArtId)];
-   ?garbage_type(GarbageType);
-   ?robot_type(RobotType);
-   if (RobotType == GarbageType){ //Controllo tipologia
-      pickUpGarbage(Garbage); // Azione pickup (Il GameObject spazzatura attraverso il perceive deve impostare il suo stato come occupato)
-   } else { //non giusta --> unfocus + rimuovo belief found_garbage(_) e arrived_to(_) + riattivo plan "RICICLA"
-      !stopFocusExternalSynapsisBody(Garbage);
-      removeRuntimeObsProperty("found_garbage") [artifact_id(ArtId)];
-      removeRuntimeObsProperty("arrived_to") [artifact_id(ArtId)];
-      !!recycle;
-   }.
-   
-+!recycle: found_garbage(Garbage) <-
-   ?my_synapsis_body_ID(ArtID);
-   synapsisLog("Vado verso la spazzatura vista in precedenza") [artifact_id(ArtID)];
-   goTo(Garbage) [artifact_id(ArtID)].
        
 -!recycle <-
-   ?my_synapsis_body_ID(ArtID);
-   synapsisLog("Sono libero... cerco della spazzatura")[artifact_id(ArtID)];
-   searchGarbage. //azione per cercare spazzatura
-   
+   ?my_synapsis_body_ID(MyArtID);
+   synapsisLog("Sono libero... cerco della spazzatura")[artifact_id(MyArtID)];
+   searchAction("garbage")[artifact_id(MyArtID)]. //azione per cercare spazzatura
+ 
 
 // inclusione dell'asl che contenente belief e plan di base per synapsis. è possibile collegare anche un file asl all'interno di un JAR
 { include("synapsisJaCaMo/synapsis_base_agent.asl") } 

@@ -251,5 +251,7 @@ class Message {
       return "Message TimeStats -> Total: " + this.getTotalTime() + " mills - S2S: " + this.getTimeFromSenderToSynapsis() + " mills - SC: "
             + this.getSynapsisComputation() + " mills - S2R: " + this.getTimeFromSynapsisToReceiver() + " mills";
    }
+   
+   //FIXME sviluppare metodi per ottenere la media delle statistiche
 
 }

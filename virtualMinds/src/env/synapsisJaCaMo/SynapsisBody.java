@@ -7,8 +7,10 @@ import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.websocket.ClientEndpoint;
@@ -32,7 +34,8 @@ public abstract class SynapsisBody extends Artifact {
    private SynapsisWebSocket webSocket;
    protected SynapsisBodyInfo bodyInfo;
 
-   private ArrayList<String> runtimeObsProperties = new ArrayList<String>();
+   private List<String> runtimeObsProperties = Collections.synchronizedList(new ArrayList<String>());
+   private boolean mockEntityRequest = false;
 
    protected void init(final String name, final String url, final int reconnectionAttempts) {
       this.bodyInfo = new SynapsisBodyInfo(name);
@@ -42,10 +45,30 @@ public abstract class SynapsisBody extends Artifact {
       this.webSocket = new SynapsisWebSocket(url, reconnectionAttempts);
    }
 
-   //XXX: Per essere sicuri di utilizzare le OPERATION del proprio SynapsisBody è necessario specificare [artifact_id(Art_Id)] dopo l'operazione che si vuole utilizzare (lato .asl)
+   // XXX: Per essere sicuri di utilizzare le OPERATION del proprio SynapsisBody è necessario specificare [artifact_id(Art_Id)] dopo l'operazione che si vuole utilizzare (lato .asl)
    @OPERATION
-   public void goTo(final String entityName) {
+   public void searchAction(final String entityType) {
+      this.sendAction(Shared.SEARCH_ACTION, new ArrayList<>(Arrays.asList(entityType)));
+   }
+
+   @OPERATION
+   public void goToAction(final String entityName) {
       this.sendAction(Shared.GO_TO_ACTION, new ArrayList<>(Arrays.asList(entityName)));
+   }
+
+   @OPERATION
+   public void stopAction() {
+      this.sendAction(Shared.STOP_ACTION, new ArrayList<>());
+   }
+
+   @OPERATION
+   public void pickUpAction(final String entityName) {
+      this.sendAction(Shared.PICK_UP_ACTION, new ArrayList<>(Arrays.asList(entityName)));
+   }
+
+   @OPERATION
+   public void releaseAction(final String entityName) {
+      this.sendAction(Shared.RELEASE_ACTION, new ArrayList<>(Arrays.asList(entityName)));
    }
 
    @OPERATION
@@ -58,37 +81,64 @@ public abstract class SynapsisBody extends Artifact {
    }
 
    @OPERATION
-   public void stopAction() {
-      this.sendAction(Shared.STOP_ACTION, new ArrayList<>());
-   }
-   
-   @OPERATION
    public void removeRuntimeObsProperty(final String property) {
-      if (this.hasObsProperty(property)) {
-         this.runtimeObsProperties.remove(property);
-         this.removeObsProperty(property);
+      this.beginExternalSession();
+      this.synapsisBodyLog("removeRuntimeObsProperty -> " + property);
+      synchronized (this.runtimeObsProperties) {
+         if (this.hasObsProperty(property)) {
+            this.runtimeObsProperties.remove(property);
+            this.removeObsProperty(property);
+         }
       }
+      this.endExternalSession(true);
    }
 
    @OPERATION
    public void removeAllRuntimeObsProperties() {
-      for (String property : this.runtimeObsProperties) {
-         this.removeRuntimeObsProperty(property);
+      this.beginExternalSession();
+      this.synapsisBodyLog("removeAllRuntimeObsProperties");
+      synchronized (this.runtimeObsProperties) {
+         for (String property : this.runtimeObsProperties) {
+            if (this.hasObsProperty(property)) {
+               this.removeObsProperty(property);
+            }
+         }
       }
+      this.runtimeObsProperties.clear();
+      this.endExternalSession(true);
+
    }
-   
+
    @OPERATION
-   public void createMyMockEntity(final String className) {
-      Message message = new Message(this.bodyInfo.getEntityName(), Shared.SYNAPSIS_MIDDLEWARE, Shared.SYNAPSIS_MIDDLEWARE_CREATE_MOCK);
-      message.addParameter(className);
-      this.webSocket.sendMessage(message);
+   public void createMyMockEntity(final String className) {  
+      if (!this.mockEntityRequest) {
+         Message message = new Message(this.bodyInfo.getEntityName(), Shared.SYNAPSIS_MIDDLEWARE, Shared.SYNAPSIS_MIDDLEWARE_CREATE_MOCK);
+         message.addParameter(className);
+         this.webSocket.sendMessage(message);
+      } else {
+         this.synapsisBodyLog("Entità mock già richiesta");
+      }  
    }
 
    @OPERATION
    public void deleteMyMockEntity() {
-      Message message = new Message(this.bodyInfo.getEntityName(), Shared.SYNAPSIS_MIDDLEWARE, Shared.SYNAPSIS_MIDDLEWARE_DELETE_MOCK);
-      this.webSocket.sendMessage(message);
+      if (this.mockEntityRequest) {
+         Message message = new Message(this.bodyInfo.getEntityName(), Shared.SYNAPSIS_MIDDLEWARE, Shared.SYNAPSIS_MIDDLEWARE_DELETE_MOCK);
+         this.webSocket.sendMessage(message);
+      }
    }
+
+   public void selfDestruction() {
+      //TODO eliminare agente collegato
+      this.dispose();
+   }
+
+   public abstract void counterpartEntityReady();
+
+   public abstract void counterpartEntityUnready();
+
+   public abstract void parseIncomingPerception(final String perception, final ArrayList<Object> params);
+
 
    @OPERATION
    protected void synapsisLog(final Object... params) {
@@ -100,13 +150,14 @@ public abstract class SynapsisBody extends Artifact {
       this.synapsisBodyLog(log);
    }
 
-   //FIXME dovrebbe essere il metodo richiamato prima della distruzione dell'artefatto??
+   // XXX: metodo richiamato prima della distruzione dell'artefatto solo runtime e non in caso di uno shoutdown coordinato
    @Override
    protected void dispose() {
       this.synapsisBodyLog("dispose");
-      this.deleteMyMockEntity(); //Invio la richiesta di eliminare la propria mock entity (anche se non presente) per evitare di lasciarla attiva nel middleware
+      this.deleteMyMockEntity(); // Invio la richiesta di eliminare la propria mock entity (anche se non
+      // presente) per evitare di lasciarla attiva nel middleware
    }
-   
+
    private void synapsisBodyLog(final String log) {
       this.beginExternalSession();
       String time = new SimpleDateFormat("HH:mm:ss").format(new Date()); // 12:08:43
@@ -114,21 +165,18 @@ public abstract class SynapsisBody extends Artifact {
       this.endExternalSession(true);
    }
 
-   public abstract void counterpartEntityReady();
-
-   public abstract void counterpartEntityUnready();
-
-   public abstract void parseIncomingPerception(final String perception, final ArrayList<Object> params);
-   
    private void sendAction(final String action, final ArrayList<Object> params) {
       this.webSocket.sendMessage(new Message(this.bodyInfo.getEntityName(), this.bodyInfo.getEntityName(), action, params));
    }
 
    private void incomingMessage(final Message message) {
-      // Begins an external use session of the artifact. Method to be called by external threads (not agents) before starting calling methods on the artifact.
+      // Begins an external use session of the artifact. Method to be called by
+      // external threads (not agents) before starting calling methods on the
+      // artifact.
       this.beginExternalSession();
 
-      // Prelevo i parametri e li converto in array di Object cosi da renderli facilmente utilizzabili su JASON
+      // Prelevo i parametri e li converto in array di Object cosi da renderli
+      // facilmente utilizzabili su JASON
       Object[] params = new Object[message.getParameters().size()];
       params = message.getParameters().toArray(params);
 
@@ -137,12 +185,15 @@ public abstract class SynapsisBody extends Artifact {
          this.updateObsProperty(message.getContent(), params);
       } else {
          this.defineObsProperty(message.getContent(), params);
+         synchronized (this.runtimeObsProperties) {
+            this.runtimeObsProperties.add(message.getContent()); // Aggiungo la nuova proprietà alla lista delle osservabili
+         }
       }
-      this.runtimeObsProperties.add(message.getContent()); //Aggiungo la nuova proprietà alla lista delle osservabili 
 
       this.parseIncomingPerception(message.getContent(), message.getParameters());
 
-      // Ends an external use session. Method to be called to close a session started by a thread to finalize the state.
+      // Ends an external use session. Method to be called to close a session started
+      // by a thread to finalize the state.
       this.endExternalSession(true);
    }
 
@@ -156,7 +207,7 @@ public abstract class SynapsisBody extends Artifact {
       }
       this.endExternalSession(true);
    }
-   
+
    @ClientEndpoint
    protected class SynapsisWebSocket extends ReconnectHandler {
 
@@ -173,8 +224,7 @@ public abstract class SynapsisBody extends Artifact {
             clientManager.getProperties().put(ClientProperties.RECONNECT_HANDLER, SynapsisWebSocket.this);
 
             // La connessione avviene in un thread separato rispetto a quello dell'artefatto
-            this.clientManager.asyncConnectToServer(SynapsisWebSocket.this, new URI(url + Shared.SYNAPSIS_ENDPOINT_PATH + Shared.ENTITY_MIND_KEY + "/" + bodyInfo.getEntityName()));
-            // this.clientManager.asyncConnectToServer(SynapsisWebSocket.this, new URI("ws://synapsis-middleware.herokuapp.com/"+ Shared.SYNAPSIS_ENDPOINT_PATH + Shared.ENTITY_MIND_KEY + "/" + bodyInfo.entityName));
+            this.clientManager.asyncConnectToServer(SynapsisWebSocket.this,new URI(url + Shared.SYNAPSIS_ENDPOINT_PATH + Shared.ENTITY_MIND_KEY + "/" + bodyInfo.getEntityName()));
 
          } catch (DeploymentException | URISyntaxException e1) {
             e1.printStackTrace();
@@ -194,9 +244,9 @@ public abstract class SynapsisBody extends Artifact {
          long currentMills = System.currentTimeMillis();
          Message message = Message.buildMessage(msg);
          message.addTimeStat(currentMills);
-         bodyInfo.addNewMessage(message); //Aggiorno le statistiche di ricezione
+         bodyInfo.addNewMessage(message); // Aggiorno le statistiche di ricezione
 
-         if (message.getSender().equals(Shared.SYNAPSIS_MIDDLEWARE)) {
+         if (message.getReceiver().equals(Shared.SYNAPSIS_MIDDLEWARE)) {
             switch (message.getContent()) {
             case Shared.COUNTERPART_READY:
                bodyInfo.setBodyStatus(ConnectionStatus.CONNECTED);
@@ -230,11 +280,11 @@ public abstract class SynapsisBody extends Artifact {
       }
 
       public void sendMessage(final Message message) {
-         try { 
+         try {
             switch (message.getReceiver()) {
             case Shared.SYNAPSIS_MIDDLEWARE:
                if (ConnectionStatus.CONNECTED.equals(bodyInfo.getSynapsisStatus())) {
-                  message.addTimeStat(System.currentTimeMillis()); //timeStat di invio
+                  message.addTimeStat(System.currentTimeMillis()); // timeStat di invio
                   this.session.getBasicRemote().sendText(message.toString());
                } else {
                   this.messagesToSendToMiddleware.add(message);
@@ -242,7 +292,7 @@ public abstract class SynapsisBody extends Artifact {
                break;
             default:
                if (ConnectionStatus.CONNECTED.equals(bodyInfo.getBodyStatus())) {
-                  message.addTimeStat(System.currentTimeMillis()); //timeStat di invio
+                  message.addTimeStat(System.currentTimeMillis()); // timeStat di invio
                   this.session.getBasicRemote().sendText(message.toString());
                } else {
                   this.messagesToSendToBody.add(message);
@@ -250,7 +300,7 @@ public abstract class SynapsisBody extends Artifact {
                break;
             }
          } catch (IOException e) {
-            message.clearTimeStats(); //rimuovo il tempo di invio
+            message.clearTimeStats(); // rimuovo il tempo di invio
             if (Shared.SYNAPSIS_MIDDLEWARE.equals(message.getReceiver())) {
                this.messagesToSendToMiddleware.add(message);
             } else {
@@ -283,7 +333,8 @@ public abstract class SynapsisBody extends Artifact {
       public boolean onDisconnect(final CloseReason closeReason) {
          bodyInfo.setCurrentReconnectionAttempt(bodyInfo.getCurrentReconnectionAttempt() + 1);
          if (this.reconnectionAttempts >= bodyInfo.getCurrentReconnectionAttempt()) {
-            synapsisBodyLog("onDisconnect - messaggio: " + closeReason.getReasonPhrase() + " --> Tentativo riconnessione " + bodyInfo.getCurrentReconnectionAttempt());
+            synapsisBodyLog(
+                  "onDisconnect - messaggio: " + closeReason.getReasonPhrase() + " --> Tentativo riconnessione " + bodyInfo.getCurrentReconnectionAttempt());
             return true;
          } else {
             return false;
@@ -295,7 +346,8 @@ public abstract class SynapsisBody extends Artifact {
       public boolean onConnectFailure(final Exception exception) {
          bodyInfo.setCurrentReconnectionAttempt(bodyInfo.getCurrentReconnectionAttempt() + 1);
          if (this.reconnectionAttempts >= bodyInfo.getCurrentReconnectionAttempt()) {
-            synapsisBodyLog("onConnectFailure - messaggio: " + exception.toString() + " --> Tentativo riconnesione " + bodyInfo.getCurrentReconnectionAttempt());
+            synapsisBodyLog(
+                  "onConnectFailure - messaggio: " + exception.toString() + " --> Tentativo riconnesione " + bodyInfo.getCurrentReconnectionAttempt());
             // exception.printStackTrace();
             return true;
          } else {

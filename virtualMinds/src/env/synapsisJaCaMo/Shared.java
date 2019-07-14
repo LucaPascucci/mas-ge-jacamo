@@ -17,6 +17,9 @@ public class Shared {
    
    public static final String GO_TO_ACTION = "go_to";
    public static final String STOP_ACTION = "stop";
+   public static final String SEARCH_ACTION = "search";
+   public static final String PICK_UP_ACTION = "pick_up";
+   public static final String RELEASE_ACTION = "pick_up";
 
    public final static String SYNAPSIS_COUNTERPART_STATUS_BELIEF = "synapsis_counterpart_status";
 

@@ -89,7 +89,7 @@ synapsis_base_name("synapsis_").
    ?synapsis_base_name(BaseName);
    .concat(BaseName,EntityName,ArtifactName);
    lookupArtifact(ArtifactName,Id);
-   stopFocus(Id). //XXX lo stopFocus non rimuove correttamente il belief --> focused(_,ArtifactName,_)
+   stopFocus(Id). //XXX: lo stopFocus non rimuove correttamente il belief --> focused(_,ArtifactName,_)
     
 -!stopFocusExternalSynapsisBody(EntityName) <-
    ?my_synapsis_body_ID(ArtId);
