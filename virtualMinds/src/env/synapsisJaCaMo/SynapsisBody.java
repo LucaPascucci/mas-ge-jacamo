@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.DeploymentException;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -81,30 +82,30 @@ public abstract class SynapsisBody extends Artifact {
    }
 
    @OPERATION
-   public void removeRuntimeObsProperty(final String property) {
+   public void removeRuntimeObservableProperty(final String property) {
       this.beginExternalSession();
-      this.synapsisBodyLog("removeRuntimeObsProperty -> " + property);
+      this.synapsisBodyLog("removeRuntimeObservableProperty -> " + property);
       synchronized (this.runtimeObsProperties) {
          if (this.hasObsProperty(property)) {
-            this.runtimeObsProperties.remove(property);
             this.removeObsProperty(property);
+            this.runtimeObsProperties.remove(property);
          }
       }
       this.endExternalSession(true);
    }
 
    @OPERATION
-   public void removeAllRuntimeObsProperties() {
+   public void removeAllRuntimeObservableProperties() {
+      this.synapsisBodyLog("removeAllRuntimeObservableProperties -> " + this.runtimeObsProperties.toString());
       this.beginExternalSession();
-      this.synapsisBodyLog("removeAllRuntimeObsProperties");
       synchronized (this.runtimeObsProperties) {
          for (String property : this.runtimeObsProperties) {
             if (this.hasObsProperty(property)) {
                this.removeObsProperty(property);
             }
          }
+         this.runtimeObsProperties.clear();
       }
-      this.runtimeObsProperties.clear();
       this.endExternalSession(true);
 
    }
@@ -128,8 +129,10 @@ public abstract class SynapsisBody extends Artifact {
       }
    }
 
+   @OPERATION
    public void selfDestruction() {
-      //TODO eliminare agente collegato
+      this.deleteMyMockEntity();// Invio la richiesta di eliminare la propria mock entity (anche se non presente) per evitare di lasciarla attiva nel middleware
+      this.webSocket.closeConnection();
       this.dispose();
    }
 
@@ -154,8 +157,6 @@ public abstract class SynapsisBody extends Artifact {
    @Override
    protected void dispose() {
       this.synapsisBodyLog("dispose");
-      this.deleteMyMockEntity(); // Invio la richiesta di eliminare la propria mock entity (anche se non
-      // presente) per evitare di lasciarla attiva nel middleware
    }
 
    private void synapsisBodyLog(final String log) {
@@ -309,6 +310,14 @@ public abstract class SynapsisBody extends Artifact {
             e.printStackTrace();
          }
       }
+      
+      public void closeConnection() {
+         try {
+            this.session.close(new CloseReason(CloseCodes.NORMAL_CLOSURE, Shared.SELF_DESTRUCTION));
+         } catch (IOException e) {
+            e.printStackTrace();
+         }
+      }
 
       private void rifleMessagesToSendToBody() {
          // printLog("Invio al body tutti i messaggi in attesa...");
@@ -331,6 +340,11 @@ public abstract class SynapsisBody extends Artifact {
       @Override
       // Invocato dopo il metodo onClose della WebSocket
       public boolean onDisconnect(final CloseReason closeReason) {
+         
+         //Caso di auto-distruzione dell'entità
+         if (CloseCodes.NORMAL_CLOSURE.equals(closeReason.getCloseCode()) && Shared.SELF_DESTRUCTION.equals(closeReason.getReasonPhrase())){
+            return false;
+         }
          bodyInfo.setCurrentReconnectionAttempt(bodyInfo.getCurrentReconnectionAttempt() + 1);
          if (this.reconnectionAttempts >= bodyInfo.getCurrentReconnectionAttempt()) {
             synapsisBodyLog(

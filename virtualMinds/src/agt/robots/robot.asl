@@ -5,35 +5,34 @@ synapsis_body_class("robots.RobotBody").
 
 /* Initial goals */
 
-!createSynapsisBody(["plastic"]).
-!createMySynapsisMockEntity("PlasticRobotMock").
+// !createSynapsisBody(["plastic"]).
+// !createMySynapsisMockEntity("PlasticRobotMock").
 
 /* Beliefs dinamici */
 
 +synapsis_counterpart_status(Name, C): .my_name(Me) & .substring(Me,Name) <-
-   ?my_synapsis_body_ID(ArtId);
+   ?my_synapsis_body_ID(MyArtID);
    if (C == true){
-      synapsisLog("Controparte collegata -> Mettiamoci al lavoro!!!")[artifact_id(ArtId)];
+      synapsisLog("Controparte collegata -> Mettiamoci al lavoro!!!")[artifact_id(MyArtID)];
       !!recycle;
    } else {
-      synapsisLog("Controparte non collegata")[artifact_id(ArtId)];
+      .drop_all_intentions;
+      synapsisLog("Controparte non collegata")[artifact_id(MyArtID)];
    }.
 
 //TODO prelevare ArtId di questo belief e se necessario effettuare "stopfocus..."
-/*
-+garbage_status(C, Name) <-
-   ?my_synapsis_body_ID(ArtId);
++picked_up_by(C, Name) <-
+   ?my_synapsis_body_ID(MyArtID);
    if (C == true){
-      synapsisLog("Attenzione! Spazzatura prelevata da -> ", Name) [artifact_id(ArtId)];
+      synapsisLog("Attenzione! Spazzatura prelevata da -> ", Name) [artifact_id(MyArtID)];
       .my_name(Me);
-      if (not .substring(Me,Name)){ //TODO questo controllo non va bene 
-         .drop_all_intentions; //TODO controllare se è necessario
-         stopAction [artifact_id(ArtId)]; //fermo il body
-         removeRuntimeObsProperty("found_garbage") [artifact_id(ArtId)];
+      if (not .substring(Me,Name)){ 
+         .drop_all_intentions;
+         stopAction [artifact_id(MyArtID)]; //fermo il body
+         removeRuntimeObsProperty("found_garbage") [artifact_id(MyArtID)];
          !!recycle;
       };
    }.
-*/
    
    
 +found(Name) <-
@@ -54,18 +53,21 @@ synapsis_body_class("robots.RobotBody").
 +released(Name) <-
    ?my_synapsis_body_ID(MyArtID);
    synapsisLog("Ho rilasciato questa entità -> ", Name)[artifact_id(MyArtID)];
-   removeAllRuntimeObsProperties[artifact_id(ArtId)].
+   removeAllRuntimeObservableProperties[artifact_id(MyArtID)];
+   .wait(2000);
+   !!recycle.
 
 /* Plans */
 
 +!recycle: picked(Garbage) & found(Bin) & arrived_to(Bin) & robot_type(Type) & bin_type(Type) <- //Controllo tipologia bidone
    ?my_synapsis_body_ID(MyArtID);
-   synapsisLog("Stessa tipologia di bidone -> ", Bin)[artifact_id(MyArtID)]; //FIXME sull'artefatto bin?? non ha senso
-   releaseAction(Garbage)[artifact_id(MyArtID)]; //FIXME sull'artefatto bin?? non ha senso
-   synapsisLog("Riciclo la spazzatura -> ", Garbage)[artifact_id(MyArtID)]; //FIXME sull'artefatto bin?? non ha senso
+   synapsisLog("Stessa tipologia di bidone -> ", Bin)[artifact_id(MyArtID)];
+   synapsisLog("Riciclo la spazzatura -> ", Garbage)[artifact_id(MyArtID)];
+   releaseAction(Garbage)[artifact_id(MyArtID)];
    recycleMe; // operazione dell'artefatto Garbage
    !stopFocusExternalSynapsisBody(Bin);
    !stopFocusExternalSynapsisBody(Garbage).
+   
    
 +!recycle: found(Name) & arrived_to(Name) & picked(Name) <-
    ?my_synapsis_body_ID(MyArtID);
@@ -74,7 +76,7 @@ synapsis_body_class("robots.RobotBody").
    
 +!recycle: found(Name) & arrived_to(Name) & robot_type(Type) & garbage_type(Type) <- //Controllo tipologia spazzatura
    ?my_synapsis_body_ID(MyArtID);
-   synapsisLog("Stessa tipologia di spazzatura -> ", Name)[artifact_id(MyArtID)]; //FIXME sull'artefatto bin?? non ha senso
+   synapsisLog("Stessa tipologia di spazzatura -> ", Name)[artifact_id(MyArtID)];
    pickUpAction(Name)[artifact_id(MyArtID)]. // azione per prendere spazzatura
    
 +!recycle: found(Name) <-

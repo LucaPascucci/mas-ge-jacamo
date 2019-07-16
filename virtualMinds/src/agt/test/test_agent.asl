@@ -10,27 +10,17 @@ synapsis_body_class("artifacts.SimpleAgentBody").
 !createMySynapsisMockEntity("TestMock").
 
 //INIZIO -> BELIEF DINAMICI
-+synapsis_counterpart_status(C) <-
++synapsis_counterpart_status(Name, C): .my_name(Me) & .substring(Me,Name) <-
+   ?my_synapsis_body_ID(MyArtID);
    if (C == true){
-      !logMessage("Controparte collegata");
-      !!personalSend;
+      synapsisLog("Controparte collegata")[artifact_id(MyArtID)];
    } else {
-      !logMessage("Controparte non collegata");
+      synapsisLog("Controparte non collegata")[artifact_id(MyArtID)];
    }.
-   
-+risposta_automatica(X,Y,Z) <-
-   if (Y == false){
-      .print("Arrivata la risposta automatica -> valori: ",X, " - ", Y ," - ", Z );
-   }.
- 
+
 //FINE -> BELIEF DINAMICI
 
 /* Plans */
-
-+!personalSend <-
-   azionePersonalizzata;
-   .wait(3000);
-   !!personalSend.
 
 
 // inclusione dell'asl che contenente belief e plan di base per synapsis è possibile collegare anche un file asl all'interno di un JAR

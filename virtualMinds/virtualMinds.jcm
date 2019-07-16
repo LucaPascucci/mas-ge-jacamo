@@ -19,25 +19,74 @@
 
 mas virtualMinds { 
    
-   agent plastic_robot: robots/plastic_robot.asl
-   //agent paper_robot: robots/paper_robot.asl
-   //agent glass_robot: robots/glass_robot.asl
+   agent plastic_robot: robots/robot.asl {
+      goals: createSynapsisBody(["plastic"]), createMySynapsisMockEntity("PlasticRobotMock")
+   }
    
-   agent plastic_garbage_spawner: garbages/plastic_garbage_spawner.asl
-   //agent paper_garbage_spawner: garbages/paper_garbage_spawner.asl
-   //agent glass_garbage_spawner: garbages/glass_garbage_spawner.asl
+   /*
+   agent paper_robot: robots/robot.asl {
+      goals: createSynapsisBody(["paper"]) //, createMySynapsisMockEntity("PaperRobotMock")
+   }
    
-   agent plastic_bin_spawner: bins/plastic_bin_spawner.asl
-   //agent paper_bin_spawner: bins/paper_bin_spawner.asl
-   //agent glass_bin_spawner: bins/glass_bin_spawner.asl
+   agent glass_robot: robots/robot.asl {
+      goals: createSynapsisBody(["glass"]) //, createMySynapsisMockEntity("GlassRobotMock")
+   }
+   */
+   
+   agent plastic_garbage_spawner: garbages/garbage_spawner.asl {
+      
+      beliefs: synapsis_body_base_name("plastic_garbage")
+      
+      goals: spawnSynapsisArtifact(2,["plastic"])
+   }
+   
+   /*
+   agent paper_garbage_spawner: garbages/garbage_spawner.asl {
+      
+      beliefs: synapsis_body_base_name("paper_garbage")
+      
+      goals: spawnSynapsisArtifact(1,["paper"])
+   }
+   
+   agent glass_garbage_spawner: garbages/garbage_spawner.asl {
+      
+      beliefs: synapsis_body_base_name("glass_garbage")
+      
+      goals: spawnSynapsisArtifact(1,["glass"])
+   }
+   */
+   
+   agent plastic_bin_spawner: bins/bin_spawner.asl {
+      
+      beliefs: synapsis_body_base_name("plastic_bin")
+      
+      goals: spawnSynapsisArtifact(1,["plastic"])
+   }
+   /*
+   agent paper_bin_spawner: bins/bin_spawner.asl {
+      
+      beliefs: synapsis_body_base_name("paper_bin")
+      
+      goals: spawnSynapsisArtifact(1,["paper"])
+   }
+   
+   agent glass_bin_spawner: bins/bin_spawner.asl {
+      
+      beliefs: synapsis_body_base_name("glass_bin")
+      
+      goals: spawnSynapsisArtifact(1,["glass"])
+   }
+   */
    
    // STRUTTURA PER ISTANZIARE N agenti
-   /*agent test : simple_agent.asl {
+   /*agent test : test_agent.asl {
        instances: 2
    }*/
    
    /*workspace w1 {
       artifact garbage: garbages.GarbageBody("garbage","ws://localhost:9000/",5)
    }*/
+   
+   //agent test1: test/test_agent.asl
    
 }

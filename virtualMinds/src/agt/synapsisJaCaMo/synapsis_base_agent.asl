@@ -26,6 +26,13 @@ synapsis_base_name("synapsis_").
    } else {
       synapsisLog("Controparte non collegata") [artifact_id(ArtId)];
    }.
+   
++self_destruction <-
+   ?my_synapsis_body_ID(ArtId);
+   synapsisLog("Arrivata richiesta auto-distruzione") [artifact_id(ArtId)];
+   selfDestruction [artifact_id(ArtId)];
+   .my_name(Me);
+   .kill_agent(Me).
 
 /* Plans */
 

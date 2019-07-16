@@ -25,8 +25,7 @@ public class GarbageBody extends SynapsisBody {
    @OPERATION
    void recycleMe() {
       this.doAction("recycle_me", new ArrayList<>());
-      //TODO avviare la distruzione dell'artefatto
-      //this.selfDestruction();
+      // this.selfDestruction();
    }
 
    @Override
