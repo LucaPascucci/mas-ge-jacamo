@@ -19,11 +19,11 @@
 
 mas virtualMinds { 
    
+   /* ROBOT */
    agent plastic_robot: robots/robot.asl {
-      goals: createSynapsisBody(["plastic"]), createMySynapsisMockEntity("PlasticRobotMock")
+      goals: createSynapsisBody(["plastic"])//, createMySynapsisMockEntity("PlasticRobotMock")
    }
    
-   /*
    agent paper_robot: robots/robot.asl {
       goals: createSynapsisBody(["paper"]) //, createMySynapsisMockEntity("PaperRobotMock")
    }
@@ -31,38 +31,37 @@ mas virtualMinds {
    agent glass_robot: robots/robot.asl {
       goals: createSynapsisBody(["glass"]) //, createMySynapsisMockEntity("GlassRobotMock")
    }
-   */
-   
+      
+   /* GARBAGE */
    agent plastic_garbage_spawner: garbages/garbage_spawner.asl {
       
       beliefs: synapsis_body_base_name("plastic_garbage")
       
-      goals: spawnSynapsisArtifact(2,["plastic"])
+      goals: spawnSynapsisArtifact(5,["plastic"])
    }
    
-   /*
    agent paper_garbage_spawner: garbages/garbage_spawner.asl {
       
       beliefs: synapsis_body_base_name("paper_garbage")
       
-      goals: spawnSynapsisArtifact(1,["paper"])
+      goals: spawnSynapsisArtifact(5,["paper"])
    }
    
    agent glass_garbage_spawner: garbages/garbage_spawner.asl {
       
       beliefs: synapsis_body_base_name("glass_garbage")
       
-      goals: spawnSynapsisArtifact(1,["glass"])
+      goals: spawnSynapsisArtifact(5,["glass"])
    }
-   */
    
+   /* BIN */
    agent plastic_bin_spawner: bins/bin_spawner.asl {
       
       beliefs: synapsis_body_base_name("plastic_bin")
       
       goals: spawnSynapsisArtifact(1,["plastic"])
    }
-   /*
+   
    agent paper_bin_spawner: bins/bin_spawner.asl {
       
       beliefs: synapsis_body_base_name("paper_bin")
@@ -76,7 +75,7 @@ mas virtualMinds {
       
       goals: spawnSynapsisArtifact(1,["glass"])
    }
-   */
+   
    
    // STRUTTURA PER ISTANZIARE N agenti
    /*agent test : test_agent.asl {

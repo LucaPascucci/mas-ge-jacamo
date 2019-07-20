@@ -19,7 +19,7 @@ public class GarbageBody extends SynapsisBody {
       this.defineObsProperty(GARBAGE_TYPE, params[0]); // prendo la tipologia di spazzatura dai parametri custom
      
       super.init(name, url, reconnectionAttempts);
-      this.createMyMockEntity(MOCK_CLASS);
+      // this.createMyMockEntity(MOCK_CLASS);
    }
    
    @OPERATION

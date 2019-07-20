@@ -16,7 +16,7 @@ public class BinBody extends SynapsisBody {
       this.defineObsProperty(BIN_TYPE, params[0]); // prendo la tipologia di bidone dai parametri custom
      
       super.init(name, url, reconnectionAttempts);
-      this.createMyMockEntity(MOCK_CLASS);
+      //this.createMyMockEntity(MOCK_CLASS);
    }
 
    @Override

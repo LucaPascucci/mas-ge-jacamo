@@ -14,7 +14,7 @@
  
 /* Plans */
 
-// XXX spawner non utile dato che è già possibile fare la stessa operazione nel file di configurazione di JaCaMo .jcm
+// XXX: spawner non utile dato che è già possibile fare la stessa operazione nel file di configurazione di JaCaMo .jcm
 
 +!spawnSynapsisAgent(N): N > 0  <-
    !createSynapsisAgent(N);
