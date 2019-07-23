@@ -2,16 +2,16 @@ package artifacts;
 
 import java.util.ArrayList;
 
-import cartago.*;
+import cartago.OPERATION;
 import synapsisJaCaMo.SynapsisBody;
 
 public class SimpleAgentBody extends SynapsisBody {
-   
+
    private int counter = 0;
 
    protected void init(final String name, final String url, final int reconnectionAttempts, final Object[] params) {
       super.init(name, url, reconnectionAttempts);
-      this.log("Params: " + params.length );
+      this.log("Params: " + params.length);
    }
 
    @OPERATION
@@ -21,12 +21,15 @@ public class SimpleAgentBody extends SynapsisBody {
    }
 
    @Override
-   public void counterpartEntityReady() {}
+   public void counterpartEntityReady() {
+   }
 
    @Override
-   public void counterpartEntityUnready() {}
+   public void counterpartEntityUnready() {
+   }
 
    @Override
-   public void parseIncomingPerception(String content, ArrayList<Object> params) {}
+   public void parseIncomingPerception(String content, ArrayList<Object> params) {
+   }
 
 }
