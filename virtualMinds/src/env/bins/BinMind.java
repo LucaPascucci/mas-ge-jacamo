@@ -4,9 +4,9 @@ package bins;
 
 import java.util.ArrayList;
 
-import synapsisJaCaMo.SynapsisBody;
+import synapsis.SynapsisMind;
 
-public class BinBody extends SynapsisBody {
+public class BinMind extends SynapsisMind {
   
    private static final String BIN_TYPE = "bin_type";
    

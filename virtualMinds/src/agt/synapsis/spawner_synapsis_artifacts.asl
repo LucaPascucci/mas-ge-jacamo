@@ -5,10 +5,10 @@ synapsis_base_name("synapsis_").
 
 /* Beliefs di esempio da aggiungere nell'agente che estende per definire gli artefatti
  * 
- * synapsis_body_base_name("test").
+ * synapsis_mind_base_name("test").
  * 
  * synapsis_url("ws://localhost:9000").
- * synapsis_body_class("package.JavaClass").
+ * synapsis_mind_class("package.JavaClass").
  * reconnection_attempts(5).
  */
 
@@ -25,48 +25,48 @@ synapsis_base_name("synapsis_").
 
 +!spawnSynapsisArtifact(N,Params): N >= 0 <-
    if (N = 0){
-      !logMessage("Conclusa creazione SynapsisBodies con parametri custom");
+      !logMessage("Conclusa creazione SynapsisArtifacts con parametri custom");
    } else {
-      !createSynapsisBody(N,Params);
+      !createSynapsisMind(N,Params);
       !spawnSynapsisArtifact(N-1,Params);
    }.
    
 -!spawnSynapsisArtifact(N,Params) <-
-   !logMessage("Errore durante la creazione di SynapsisBodies con parametri custom").
+   !logMessage("Errore durante la creazione di SynapsisArtifacts con parametri custom").
  
 +!spawnSynapsisArtifact(N): N >= 0 <-
    if (N = 0){
       !logMessage("Conclusa creazione SynapsisBodies");
    } else {
-      !createSynapsisBody(N);
+      !createSynapsisMind(N);
       !spawnSynapsisArtifact(N-1);
    }.
 
 -!spawnSynapsisArtifact(N) <-
-   !logMessage("Errore durante la creazione di SynapsisBodies").
+   !logMessage("Errore durante la creazione di SynapsisArtifacts").
    
-+!createSynapsisBody(N,Params): synapsis_url(Url) & synapsis_body_class(Class) & synapsis_body_base_name(BodyBaseName) & reconnection_attempts(Attempts) <-
++!createSynapsisMind(N,Params): synapsis_url(Url) & synapsis_mind_class(Class) & synapsis_mind_base_name(MindBaseName) & reconnection_attempts(Attempts) <-
    ?synapsis_base_name(BaseName);
-   .concat(BodyBaseName,N,SynapsisBodyName);
-   .concat(BaseName,SynapsisBodyName,ArtifactName);
-   makeArtifact(ArtifactName,Class,[SynapsisBodyName,Url,Attempts,Params],Id);
-   .concat("Creato ", SynapsisBodyName, Message);
+   .concat(MindBaseName,N,SynapsisMindName);
+   .concat(BaseName,SynapsisMindName,ArtifactName);
+   makeArtifact(ArtifactName,Class,[SynapsisMindName,Url,Attempts,Params],Id);
+   .concat("Creato ", SynapsisMindName, Message);
    !logMessage(Message).
    
--!createSynapsisBody(N,Params) <-
-   .concat("Errore durante la creazione dell'artefatto SynapsisBody-", N, " con parametri custom", Message);
+-!createSynapsisMind(N,Params) <-
+   .concat("Errore durante la creazione dell'artefatto SynapsisArtifacts-", N, " con parametri custom", Message);
    !logMessage(Message).
    
-+!createSynapsisBody(N): synapsis_url(Url) & synapsis_body_class(Class) & synapsis_body_base_name(BodyBaseName) & reconnection_attempts(Attempts) <-
++!createSynapsisMind(N): synapsis_url(Url) & synapsis_mind_class(Class) & synapsis_mind_base_name(MindBaseName) & reconnection_attempts(Attempts) <-
    ?synapsis_base_name(BaseName);
-   .concat(BodyBaseName,N,SynapsisBodyName);
-   .concat(BaseName,SynapsisBodyName,ArtifactName);
-   makeArtifact(ArtifactName,Class,[SynapsisBodyName,Url,Attempts],Id);
-   .concat("Creato ", SynapsisBodyName, Message);
+   .concat(MindBaseName,N,SynapsisMindName);
+   .concat(BaseName,SynapsisMindName,ArtifactName);
+   makeArtifact(ArtifactName,Class,[SynapsisMindName,Url,Attempts],Id);
+   .concat("Creato ", SynapsisMindName, Message);
    !logMessage(Message).
 
--!createSynapsisBody(N) <-
-   .concat("Errore durante la creazione dell'artefatto SynapsisBody-", N, Message);
+-!createSynapsisMind(N) <-
+   .concat("Errore durante la creazione dell'artefatto SynapsisArtifacts-", N, Message);
    !logMessage(Message).
    
 +!logMessage(Message) <- 

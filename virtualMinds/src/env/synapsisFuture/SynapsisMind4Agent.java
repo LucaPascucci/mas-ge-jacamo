@@ -1,10 +1,10 @@
-package synapsisJaCaMoFuture;
+package synapsisFuture;
 
 import java.util.ArrayList;
 
-import synapsisJaCaMo.SynapsisBody;
+import synapsis.SynapsisMind;
 
-public class SynapsisBody4Agent extends SynapsisBody {
+public class SynapsisMind4Agent extends SynapsisMind {
    
    protected void init(final String name, final String url, final int reconnectionAttempts) {
       super.init(name, url, reconnectionAttempts);

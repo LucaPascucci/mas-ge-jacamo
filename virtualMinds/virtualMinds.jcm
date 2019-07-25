@@ -21,35 +21,35 @@ mas virtualMinds {
    
    /* ROBOT */
    agent plastic_robot: robots/robot.asl {
-      goals: createSynapsisBody(["plastic"])//, createMySynapsisMockEntity("PlasticRobotMock")
+      goals: createSynapsisMind(["plastic"])//, createMySynapsisMockEntity("PlasticRobotMock")
    }
    
    agent paper_robot: robots/robot.asl {
-      goals: createSynapsisBody(["paper"]) //, createMySynapsisMockEntity("PaperRobotMock")
+      goals: createSynapsisMind(["paper"]) //, createMySynapsisMockEntity("PaperRobotMock")
    }
    
    agent glass_robot: robots/robot.asl {
-      goals: createSynapsisBody(["glass"]) //, createMySynapsisMockEntity("GlassRobotMock")
+      goals: createSynapsisMind(["glass"]) //, createMySynapsisMockEntity("GlassRobotMock")
    }
       
    /* GARBAGE */
    agent plastic_garbage_spawner: garbages/garbage_spawner.asl {
       
-      beliefs: synapsis_body_base_name("plastic_garbage")
+      beliefs: synapsis_mind_base_name("plastic_garbage")
       
       goals: spawnSynapsisArtifact(5,["plastic"])
    }
    
    agent paper_garbage_spawner: garbages/garbage_spawner.asl {
       
-      beliefs: synapsis_body_base_name("paper_garbage")
+      beliefs: synapsis_mind_base_name("paper_garbage")
       
       goals: spawnSynapsisArtifact(5,["paper"])
    }
    
    agent glass_garbage_spawner: garbages/garbage_spawner.asl {
       
-      beliefs: synapsis_body_base_name("glass_garbage")
+      beliefs: synapsis_mind_base_name("glass_garbage")
       
       goals: spawnSynapsisArtifact(5,["glass"])
    }
@@ -57,21 +57,21 @@ mas virtualMinds {
    /* BIN */
    agent plastic_bin_spawner: bins/bin_spawner.asl {
       
-      beliefs: synapsis_body_base_name("plastic_bin")
+      beliefs: synapsis_mind_base_name("plastic_bin")
       
       goals: spawnSynapsisArtifact(1,["plastic"])
    }
    
    agent paper_bin_spawner: bins/bin_spawner.asl {
       
-      beliefs: synapsis_body_base_name("paper_bin")
+      beliefs: synapsis_mind_base_name("paper_bin")
       
       goals: spawnSynapsisArtifact(1,["paper"])
    }
    
    agent glass_bin_spawner: bins/bin_spawner.asl {
       
-      beliefs: synapsis_body_base_name("glass_bin")
+      beliefs: synapsis_mind_base_name("glass_bin")
       
       goals: spawnSynapsisArtifact(1,["glass"])
    }

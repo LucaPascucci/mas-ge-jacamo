@@ -5,9 +5,9 @@ package garbages;
 import java.util.ArrayList;
 
 import cartago.OPERATION;
-import synapsisJaCaMo.SynapsisBody;
+import synapsis.SynapsisMind;
 
-public class GarbageBody extends SynapsisBody {
+public class GarbageMind extends SynapsisMind {
    
    private static final String PICKED_UP_BY = "picked_up_by";
    private static final String GARBAGE_TYPE = "garbage_type";

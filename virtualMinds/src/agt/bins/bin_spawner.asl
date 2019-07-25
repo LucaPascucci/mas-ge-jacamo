@@ -1,8 +1,8 @@
 /* Initial beliefs and rules */
 
 synapsis_url("ws://localhost:9000/").
-//synapsis_body_base_name("plastic_bin").
-synapsis_body_class("bins.BinBody").
+//synapsis_mind_base_name("plastic_bin").
+synapsis_mind_class("bins.BinMind").
 reconnection_attempts(5).
 
 /* Initial goals */

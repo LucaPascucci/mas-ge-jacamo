@@ -1,4 +1,4 @@
-package synapsisJaCaMo;
+package synapsis;
 
 public class Shared {
    

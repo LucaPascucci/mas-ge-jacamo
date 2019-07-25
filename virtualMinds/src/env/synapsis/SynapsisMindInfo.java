@@ -1,6 +1,6 @@
-package synapsisJaCaMo;
+package synapsis;
 
-public class SynapsisBodyInfo {
+public class SynapsisMindInfo {
    
    private String entityName;
    
@@ -16,7 +16,7 @@ public class SynapsisBodyInfo {
    private long totalReceiveTime = 0;
    private long totalTime = 0;
    
-   public SynapsisBodyInfo(String name) {
+   public SynapsisMindInfo(String name) {
       this.entityName = name;
    }
 

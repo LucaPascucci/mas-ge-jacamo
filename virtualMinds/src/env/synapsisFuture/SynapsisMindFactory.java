@@ -1,10 +1,10 @@
 // CArtAgO artifact code for project virtualMinds
 
-package synapsisJaCaMoFuture;
+package synapsisFuture;
 
 import cartago.*;
 
-public class SynapsisBodyFactory extends Artifact {
+public class SynapsisMindFactory extends Artifact {
 
    private final static String SYNAPSIS_BODY_BASE_NAME = "synapsis_";
    

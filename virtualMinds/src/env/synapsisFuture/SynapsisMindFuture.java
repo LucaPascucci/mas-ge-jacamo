@@ -1,6 +1,6 @@
-package synapsisJaCaMoFuture;
+package synapsisFuture;
 
-public class SynapsisBodyFuture {
+public class SynapsisMindFuture {
    
    /*
    private void createMockEntities(final String className, final String entityName, final int numberOfEntities) {

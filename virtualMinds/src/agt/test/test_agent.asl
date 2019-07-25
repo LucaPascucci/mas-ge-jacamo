@@ -2,16 +2,16 @@
 
 synapsis_url("ws://localhost:9000/").
 reconnection_attempts(5).
-synapsis_body_class("artifacts.SimpleAgentBody").
+synapsis_mind_class("artifacts.SimpleAgentMind").
 
 /* Initial goals */
 
-!createSynapsisBody(["prova",1,false]).
+!createSynapsisMind(["prova",1,false]).
 !createMySynapsisMockEntity("TestMock").
 
 //INIZIO -> BELIEF DINAMICI
 +synapsis_counterpart_status(Name, C): .my_name(Me) & .substring(Me,Name) <-
-   ?my_synapsis_body_ID(MyArtID);
+   ?my_synapsis_mind_ID(MyArtID);
    if (C == true){
       synapsisLog("Controparte collegata")[artifact_id(MyArtID)];
    } else {

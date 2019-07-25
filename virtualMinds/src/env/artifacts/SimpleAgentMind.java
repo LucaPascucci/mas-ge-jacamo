@@ -3,9 +3,9 @@ package artifacts;
 import java.util.ArrayList;
 
 import cartago.OPERATION;
-import synapsisJaCaMo.SynapsisBody;
+import synapsis.SynapsisMind;
 
-public class SimpleAgentBody extends SynapsisBody {
+public class SimpleAgentMind extends SynapsisMind {
 
    private int counter = 0;
 

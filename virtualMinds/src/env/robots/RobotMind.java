@@ -2,9 +2,9 @@ package robots;
 
 import java.util.ArrayList;
 
-import synapsisJaCaMo.SynapsisBody;
+import synapsis.SynapsisMind;
 
-public class RobotBody extends SynapsisBody {
+public class RobotMind extends SynapsisMind {
    
    private static final String ROBOT_TYPE = "robot_type";
  

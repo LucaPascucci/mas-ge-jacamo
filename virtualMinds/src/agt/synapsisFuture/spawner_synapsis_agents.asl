@@ -2,6 +2,7 @@
  * 
  * synapsis_agent_base_name("simple_agent").
  * synapsis_agent_path("src/agt/simple_agent.asl").
+ * 
  * obbligatorio che il file asl da creare includa synapsis_base_agent.asl ed avere i beliefs e goal iniziale richiesti da quest'ultimo
  * 
  */

@@ -1,4 +1,4 @@
-package synapsisJaCaMo;
+package synapsis;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
