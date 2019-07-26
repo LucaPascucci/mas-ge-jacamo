@@ -1,4 +1,4 @@
-// Synapsis base agent --> Agente che deve essere incluso per creare ed utilizzare Synapsis Body
+// Synapsis base agent --> Agente che deve essere incluso per creare ed utilizzare l'artefatto SynapsisMind
 
 /* Initial beliefs and rules */
 synapsis_base_name("synapsis_").

@@ -29,6 +29,9 @@ import org.glassfish.tyrus.client.ClientProperties;
 
 import cartago.Artifact;
 import cartago.OPERATION;
+import synapsis.model.Message;
+import synapsis.model.Shared;
+import synapsis.model.SynapsisMindInfo;
 
 public abstract class SynapsisMind extends Artifact {
 

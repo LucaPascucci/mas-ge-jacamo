@@ -1,4 +1,4 @@
-package synapsis;
+package synapsis.model;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Classe che rappresenta il messaggio scambiato con il middleware
  */
-class Message {
+public class Message {
 
    /**
     * Mittente

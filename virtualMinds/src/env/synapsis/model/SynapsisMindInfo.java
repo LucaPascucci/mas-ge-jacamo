@@ -1,4 +1,6 @@
-package synapsis;
+package synapsis.model;
+
+import synapsis.ConnectionStatus;
 
 public class SynapsisMindInfo {
    
@@ -28,7 +30,7 @@ public class SynapsisMindInfo {
       return synapsisStatus;
    }
 
-   protected void setSynapsisStatus(ConnectionStatus synapsisStatus) {
+   public void setSynapsisStatus(ConnectionStatus synapsisStatus) {
       this.synapsisStatus = synapsisStatus;
    }
 
@@ -36,7 +38,7 @@ public class SynapsisMindInfo {
       return bodyStatus;
    }
 
-   protected void setBodyStatus(ConnectionStatus bodyStatus) {
+   public void setBodyStatus(ConnectionStatus bodyStatus) {
       this.bodyStatus = bodyStatus;
    }
 
@@ -44,11 +46,11 @@ public class SynapsisMindInfo {
       return currentReconnectionAttempt;
    }
 
-   protected void setCurrentReconnectionAttempt(int currentReconnectionAttempt) {
+   public void setCurrentReconnectionAttempt(int currentReconnectionAttempt) {
       this.currentReconnectionAttempt = currentReconnectionAttempt;
    }
    
-   protected void addNewMessage(Message message) {
+   public void addNewMessage(Message message) {
       this.numberOfReceivedMessages++;
       this.totalSendTime += message.getTimeFromSenderToSynapsis();
       this.totalComputationTime += message.getSynapsisComputation();

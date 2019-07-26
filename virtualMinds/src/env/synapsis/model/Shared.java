@@ -1,4 +1,4 @@
-package synapsis;
+package synapsis.model;
 
 public class Shared {
    

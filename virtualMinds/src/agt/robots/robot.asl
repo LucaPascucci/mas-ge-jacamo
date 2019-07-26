@@ -1,12 +1,6 @@
-/* Beliefs per synapsis */
-synapsis_url("ws://localhost:9000/").
-reconnection_attempts(5).
-synapsis_mind_class("robots.RobotMind").
+/* Initial beliefs and rules */
 
 /* Initial goals */
-
-// !createSynapsisMind(["plastic"]).
-// !createMySynapsisMockEntity("PlasticRobotMock").
 
 /* Beliefs dinamici */
 
@@ -39,8 +33,6 @@ synapsis_mind_class("robots.RobotMind").
 +stopped <-
    .wait(500);
    !!recycle.
-
-//XXX: non è stata utilizzata la perception touched
    
 +found(Name) <-
    ?my_synapsis_mind_ID(MyArtID);
