@@ -14,10 +14,103 @@
 
 mas recyclingRobots {
    
-   // agent paper_robot: paper_robot.asl
-   // agent glass_robot: glass_robot.asl
-   agent plastic_robot: robots/plastic_robot.asl
+  /* ROBOT */
+   agent plastic_robot: robots/robot.asl {
+      // Beliefs per synapsis
+      beliefs: synapsis_url("ws://localhost:9000/")
+               synapsis_mind_class("robots.RobotMind")
+               reconnection_attempts(5)
+               
+      // synapsis goal
+      goals: createSynapsisMind(["plastic"])//, createMySynapsisMockEntity("PlasticRobotBodyMock")
+   }
    
-   agent plastic_garbage_spawner: garbages/plastic_garbage_spawner.asl
+   agent paper_robot: robots/robot.asl {
+      // Beliefs per synapsis
+      beliefs: synapsis_url("ws://localhost:9000/")
+               synapsis_mind_class("robots.RobotMind")
+               reconnection_attempts(5)
+      
+      // synapsis goal     
+      goals: createSynapsisMind(["paper"])
+   }
+   
+   agent glass_robot: robots/robot.asl {
+      // Beliefs per synapsis
+      beliefs: synapsis_url("ws://localhost:9000/")
+               synapsis_mind_class("robots.RobotMind")
+               reconnection_attempts(5)
+      
+      // synapsis goal
+      goals: createSynapsisMind(["glass"])
+   }
+      
+   /* GARBAGES */
+   agent plastic_garbage_spawner: garbages/garbage_spawner.asl {
+      // Beliefs per synapsis spawner
+      beliefs: synapsis_mind_base_name("plastic_garbage")
+               synapsis_url("ws://localhost:9000/")
+               synapsis_mind_class("garbages.GarbageMind")
+               reconnection_attempts(5)
+      
+      // synapsis goal
+      goals: spawnSynapsisArtifact(5,["plastic"]) //, createMySynapsisMockEntity("GarbageBodyMock")
+   }
+   
+   agent paper_garbage_spawner: garbages/garbage_spawner.asl {
+      // Beliefs per synapsis spawner
+      beliefs: synapsis_mind_base_name("paper_garbage")
+               synapsis_url("ws://localhost:9000/")
+               synapsis_mind_class("garbages.GarbageMind")
+               reconnection_attempts(5)
+      
+      // synapsis goal
+      goals: spawnSynapsisArtifact(5,["paper"]) //, createMySynapsisMockEntity("GarbageBodyMock")
+   }
+   
+   agent glass_garbage_spawner: garbages/garbage_spawner.asl {
+      // Beliefs per synapsis spawner
+      beliefs: synapsis_mind_base_name("glass_garbage")
+               synapsis_url("ws://localhost:9000/")
+               synapsis_mind_class("garbages.GarbageMind")
+               reconnection_attempts(5)
+      
+      // synapsis goal
+      goals: spawnSynapsisArtifact(5,["glass"]) //, createMySynapsisMockEntity("GarbageBodyMock")
+   }
+   
+   /* BINS */
+   agent plastic_bin_spawner: bins/bin_spawner.asl {
+      // Beliefs per synapsis spawner
+      beliefs: synapsis_mind_base_name("plastic_bin")
+               synapsis_url("ws://localhost:9000/")
+               synapsis_mind_class("bins.BinMind")
+               reconnection_attempts(5)
+      
+      // synapsis goal
+      goals: spawnSynapsisArtifact(1,["plastic"]) //, createMySynapsisMockEntity("BinBodyMock")
+   }
+   
+   agent paper_bin_spawner: bins/bin_spawner.asl {
+      // Beliefs per synapsis spawner
+      beliefs: synapsis_mind_base_name("paper_bin")
+               synapsis_url("ws://localhost:9000/")
+               synapsis_mind_class("bins.BinMind")
+               reconnection_attempts(5)
+      
+      // synapsis goal
+      goals: spawnSynapsisArtifact(1,["paper"]) //, createMySynapsisMockEntity("BinBodyMock")
+   }
+   
+   agent glass_bin_spawner: bins/bin_spawner.asl {
+      // Beliefs per synapsis spawner
+      beliefs: synapsis_mind_base_name("glass_bin")
+               synapsis_url("ws://localhost:9000/")
+               synapsis_mind_class("bins.BinMind")
+               reconnection_attempts(5)
+      
+      // synapsis goal
+      goals: spawnSynapsisArtifact(1,["glass"]) //, createMySynapsisMockEntity("BinBodyMock")
+   }
 }
 

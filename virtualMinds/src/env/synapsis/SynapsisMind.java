@@ -143,7 +143,7 @@ public abstract class SynapsisMind extends Artifact {
 
    public abstract void counterpartEntityUnready();
 
-   public abstract void parseIncomingPerception(final String perception, final ArrayList<Object> params);
+   public abstract void parseIncomingPerception(final String sender, final String perception, final ArrayList<Object> params);
 
 
    @OPERATION
@@ -194,7 +194,7 @@ public abstract class SynapsisMind extends Artifact {
          }
       }
 
-      this.parseIncomingPerception(message.getContent(), message.getParameters());
+      this.parseIncomingPerception(message.getSender(), message.getContent(), message.getParameters());
 
       // Ends an external use session. Method to be called to close a session started
       // by a thread to finalize the state.

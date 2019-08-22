@@ -8,7 +8,6 @@ public class SynapsisMind4Agent extends SynapsisMind {
    
    protected void init(final String name, final String url, final int reconnectionAttempts) {
       super.init(name, url, reconnectionAttempts);
-      
    }
 
    @Override
@@ -18,5 +17,5 @@ public class SynapsisMind4Agent extends SynapsisMind {
    public void counterpartEntityUnready() {}
 
    @Override
-   public void parseIncomingPerception(String content, ArrayList<Object> params) {}
+   public void parseIncomingPerception(String sender, String perception, ArrayList<Object> params) {}
 }

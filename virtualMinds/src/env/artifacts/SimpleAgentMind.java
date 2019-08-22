@@ -29,7 +29,7 @@ public class SimpleAgentMind extends SynapsisMind {
    }
 
    @Override
-   public void parseIncomingPerception(String content, ArrayList<Object> params) {
-   }
+   public void parseIncomingPerception(String sender, String perception, ArrayList<Object> params) {}
+
 
 }
