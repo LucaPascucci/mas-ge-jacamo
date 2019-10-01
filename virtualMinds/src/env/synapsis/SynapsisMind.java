@@ -50,31 +50,56 @@ public abstract class SynapsisMind extends Artifact {
    }
 
    // XXX: Per essere sicuri di utilizzare le OPERATION del proprio SynapsisMind è necessario specificare [artifact_id(Art_Id)] dopo l'operazione che si vuole utilizzare (lato .asl)
+   
+   /**
+    * Operazione per avviare la ricerca di un'entità 
+    * @param entityType nome anche parziale dell'entità da cercare
+    */
    @OPERATION
    public void searchAction(final String entityType) {
       this.sendAction(Shared.SEARCH_ACTION, new ArrayList<>(Arrays.asList(entityType)));
    }
 
+   /**
+    * Operazione per inviare un'azione di movimento al corpo
+    * @param entityName nome entità da raggiungere
+    */
    @OPERATION
    public void goToAction(final String entityName) {
       this.sendAction(Shared.GO_TO_ACTION, new ArrayList<>(Arrays.asList(entityName)));
    }
 
+   /**
+    * Operazione per fermare il corpo
+    */
    @OPERATION
    public void stopAction() {
       this.sendAction(Shared.STOP_ACTION, new ArrayList<>());
    }
 
+   /**
+    * Operazione per prelevare un'entità
+    * @param entityName nome dell'entita da prelevare
+    */
    @OPERATION
    public void pickUpAction(final String entityName) {
       this.sendAction(Shared.PICK_UP_ACTION, new ArrayList<>(Arrays.asList(entityName)));
    }
 
+   /**
+    * Operazione per rilasciare un'entità
+    * @param entityName nome dell'entita da rilasciare
+    */
    @OPERATION
    public void releaseAction(final String entityName) {
       this.sendAction(Shared.RELEASE_ACTION, new ArrayList<>(Arrays.asList(entityName)));
    }
 
+   /**
+    * Operazione per una generica azione
+    * @param action azione
+    * @param params parametri
+    */
    @OPERATION
    public void doAction(final String action, final Object... params) {
       if (params.length > 0) {
